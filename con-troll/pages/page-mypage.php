@@ -1,4 +1,7 @@
 <?php
+
+wp_enqueue_style( 'controll-fontawesome', 'https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css', [], '4.6.3' );
+
 /**
  * Template Name: עמוד אישי
  * Show a single event, specified by the query parameter "id"

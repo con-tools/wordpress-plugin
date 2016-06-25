@@ -28,5 +28,3 @@ function controll_api() {
 	$controll->checkAuthentication();
 	return $controll;
 }
-
-wp_enqueue_style( 'controll-fontawesome', 'https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css', [], '4.6.3' );
