@@ -124,7 +124,7 @@ function disableCheckout() {
 		<?php endif; ?>
 		
 		<div class="hidden visible-print-block" style="text-align: center">
-		<h1>דף אישור הרשמה - ביגור 16</h1>
+		<h1>דף אישור הרשמה</h1>
 		</div>
 		
 		<?php if (!empty($coupons)):?>
