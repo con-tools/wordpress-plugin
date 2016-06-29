@@ -66,7 +66,7 @@ class ConTrollSettingsPage
             'controll-api-key' // Option name
         );
 
-        register_setting(
+    	register_setting(
             'controll_option_group', // Option group
             'controll-api-secret' // Option name
         );
@@ -121,6 +121,21 @@ class ConTrollSettingsPage
             'controll-settings',
             'controll_settings_section_local'
         );
+        
+        add_settings_section(
+        		'controll_settings_section_registration', // ID
+        		'User Registration Settings', // Title
+        		array( $this, 'print_section_registration' ), // Callback
+        		'controll-settings' // Page
+        		);
+        
+        add_settings_field(
+            'registration_active',
+            "Open for registration",
+            array( $this, 'registration_active_callback' ),
+            'controll-settings',
+            'controll_settings_section_registration'
+        );
     }
 
     /**
@@ -139,6 +154,9 @@ class ConTrollSettingsPage
         print 'To integrate ConTroll into the Wordpress site, you should create a few pages using the ';
         print 'ConTroll templates, and then set the fields below to the URLs (slugs) where these new pages ';
         print 'can be found.';
+    }
+    
+    public function print_section_registration() {
     }
 
 	/**
@@ -185,6 +203,14 @@ class ConTrollSettingsPage
         );
     }
     
+    public function registration_active_callback() {
+        $checked = isset( $this->settings['registration_active'] ) and ($this->settings['registration_active']);
+        ?>
+        <input type="checkbox" value="1" id="registration_active" name="controll-plugin-settings[registration_active]"
+        <?php if ($checked):?>checked=checked<?php endif; ?> />
+        <?php
+    }
+    
     public static function get_my_page_url()
     {
         return get_option('controll-plugin-settings')['my_page_url'];
@@ -193,6 +219,10 @@ class ConTrollSettingsPage
     public static function get_event_page_url()
     {
         return get_option('controll-plugin-settings')['event_page_url'];
+    }
+    
+    public static function is_registration_active() {
+    	return get_option('controll-plugin-settings')['registration_active'] ? true : false;
     }
 }
 

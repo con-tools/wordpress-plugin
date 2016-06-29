@@ -25,32 +25,36 @@ $timeslot = helper_timeslot_fields($timeslot);
 //check if the user is logged in
 $email = controll_api()->getUserEmail();
 
-// handle form submit
-switch (@$_REQUEST['action']) {
-	case 'login':
-		wp_redirect("http://api.con-troll.org/auth/verify?redirect-url=" .
-				urlencode("http://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]?id=" . $timeslot_id), 302);
-		exit;
-	case 'register':
-		if (!$registration_enabled) {
-			wp_redirect("http://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]?id=" . $timeslot_id, 302);
+if (ConTrollSettingsPage::is_registration_active()) {
+	// handle form submit
+	switch (@$_REQUEST['action']) {
+		case 'login':
+			wp_redirect("http://api.con-troll.org/auth/verify?redirect-url=" .
+					urlencode("http://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]?id=" . $timeslot_id), 302);
 			exit;
-		}
-		$ticket = controll_api()->tickets()->create($timeslot->id);
-		if ($ticket->status) {
-			wp_redirect(ConTrollSettingsPage::get_my_page_url(), 302);
-			exit;
-		}
-		$errorMessage = $ticket->error;
-		break;
-}
+		case 'register':
+			if (!$registration_enabled) {
+				wp_redirect("http://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]?id=" . $timeslot_id, 302);
+				exit;
+			}
+			$ticket = controll_api()->tickets()->create($timeslot->id);
+			if ($ticket->status) {
+				wp_redirect(ConTrollSettingsPage::get_my_page_url(), 302);
+				exit;
+			}
+			$errorMessage = $ticket->error;
+			break;
+	}
 
-if ($email) {
-	$timeslot->{"register-button"} = 'הרשמה';
-	$formaction = 'register';
+	if ($email) {
+		$timeslot->{"register-button"} = 'הרשמה';
+		$formaction = 'register';
+	} else {
+		$timeslot->{"register-button"} = 'כניסה למערכת ההרשמה';
+		$formaction = 'login';
+	}
 } else {
-	$timeslot->{"register-button"} = 'כניסה למערכת ההרשמה';
-	$formaction = 'login';
+	$timeslot->{"register-button"} = 'ההרשמה לא פעילה';
 }
 
 $title = $timeslot->event->title;
