@@ -91,7 +91,7 @@ if ($mainwidth > 9)
 		<?php if ($errorMessage): ?>
 		<h3>שגיאה: <?php echo $errorMessage ?></h3>
 		<?php endif; ?>
-		<form name="registration" method="post" action="?">
+		<form name="registration" method="post" action="?<?php echo $_SERVER['QUERY_STRING'] ?>">
 			<input type="hidden" name="id" value="<?php echo $timeslot->id ?>">
 			<input type="hidden" name="action" value="<?php echo $formaction ?>">
 		
