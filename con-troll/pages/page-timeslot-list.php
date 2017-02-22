@@ -7,7 +7,7 @@
 
 $tags = [];
 foreach (controll_api()->tags()->catalog() as $tag) {
-	if ($tag->title != 'סבב')
+	if ($tag->title != 'משבצת זמן')
 		usort($tag->values, function($a,$b){
 			if (ord($a[0]) < 127 && ord($b[0]) > 127)
 				return 1; // hate english
@@ -54,36 +54,36 @@ get_header();
 		<input type="hidden" name="action" value="filter">
 		
 		<div class="filter-element">
-		<label for="event_type">סוג:</label>
-		<select id="event_type" name="tag:סוג ארוע" onchange="return this.form.submit();">
+		<label for="round">משבצת זמן:</label>
+		<select id="round" name="tag:משבצת זמן" onchange="return this.form.submit();">
 			<option value="">הכל</option>
-			<?php foreach ($tags['סוג ארוע'] as $value):?>
+			<?php foreach ($tags['משבצת זמן'] as $value):?>
 			<option value="<?php echo $value?>" <?php
-				if ($filters['tag:סוג ארוע'] == $value) {?>selected="selected"<?php }
+				if ($filters['tag:משבצת זמן'] == $value) {?>selected="selected"<?php }
+				?>><?php echo $value?></option>
+			<?php endforeach;?>
+		</select>
+		</div>
+
+		<div class="filter-element">
+		<label for="event_type">משבצת תוכן:</label>
+		<select id="event_type" name="tag:משבצת תוכן" onchange="return this.form.submit();">
+			<option value="">הכל</option>
+			<?php foreach ($tags['משבצת תוכן'] as $value):?>
+			<option value="<?php echo $value?>" <?php
+				if ($filters['tag:משבצת תוכן'] == $value) {?>selected="selected"<?php }
 				?>><?php echo $value?></option>
 			<?php endforeach;?>
 		</select>
 		</div>
 		
 		<div class="filter-element">
-		<label for="genre">סגנון:</label>
-		<select id="genre" name="tag:ז'אנר" onchange="return this.form.submit();">
+		<label for="genre">שיטה:</label>
+		<select id="genre" name="tag:שיטה" onchange="return this.form.submit();">
 			<option value="">הכל</option>
-			<?php foreach ($tags["ז'אנר"] as $value):?>
+			<?php foreach ($tags["שיטה"] as $value):?>
 			<option value="<?php echo $value?>" <?php
-				if ($filters["tag:ז'אנר"] == $value) {?>selected="selected"<?php }
-				?>><?php echo $value?></option>
-			<?php endforeach;?>
-		</select>
-		</div>
-		
-		<div class="filter-element">
-		<label for="round">סבב:</label>
-		<select id="round" name="tag:סבב" onchange="return this.form.submit();">
-			<option value="">הכל</option>
-			<?php foreach ($tags['סבב'] as $value):?>
-			<option value="<?php echo $value?>" <?php
-				if ($filters['tag:סבב'] == $value) {?>selected="selected"<?php }
+				if ($filters['tag:שיטה'] == $value) {?>selected="selected"<?php }
 				?>><?php echo $value?></option>
 			<?php endforeach;?>
 		</select>
@@ -95,7 +95,7 @@ get_header();
 		
 		the_post();
 		foreach ($timeslots as $timeslot) {
-			//if ($filters['tag:סבב'] and $filters['tag:סבב'] != $timeslot->round)
+			//if ($filters['tag:משבצת זמן'] and $filters['tag:משבצת זמן'] != $timeslot->round)
 			//	continue;
 			controll_set_current_object($timeslot);
 			ob_start();
