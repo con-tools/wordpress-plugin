@@ -46,7 +46,7 @@ get_header();
 
 ?>
 
-<div id="primary" class="content-area">
+<div id="primary" class="content-area event-list">
 	<main id="main" class="site-main" role="main">
 		
 		<?php /* Search tools */ ?>
