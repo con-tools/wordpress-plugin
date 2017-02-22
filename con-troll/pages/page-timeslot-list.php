@@ -44,28 +44,10 @@ usort($timeslots, function($a,$b){
 
 get_header();
 
-$mainwidth = 12;
-if (is_active_sidebar('pageright'))
-	$mainwidth -= 3;
-	if (is_active_sidebar('pageleft'))
-		$mainwidth -= 3;
-		if ($mainwidth > 9)
-			$mainwidth = 10; // don't let main content be too wide
-			?>
+?>
 
-<div class="container">
-	<div class="row">
-	
-		<?php if (is_active_sidebar('pageleft')): ?>
-		<div class="col-md-3">
-			<?php get_sidebar('left'); ?>
-		</div>
-		<?php endif; ?>
-	
-		<div class="col-md-<?php echo $mainwidth ?> registration event-list">
-		<?php if ($mainwidth == 10):?>
-			<div style="@media screen and (min-width: 783px) {margin-<?php echo is_rtl() ? 'right' : 'left'?>: -3.2em;}">
-		<?php endif;?>
+<div id="primary" class="content-area">
+	<main id="main" class="site-main" role="main">
 		
 		<?php /* Search tools */ ?>
 		<form method="get" action="">
@@ -110,29 +92,20 @@ if (is_active_sidebar('pageright'))
 		</form>
 		
 		<?php
+		
 		the_post();
 		foreach ($timeslots as $timeslot) {
-			if ($filters['tag:סבב'] and $filters['tag:סבב'] != $timeslot->round)
-				continue;
+			//if ($filters['tag:סבב'] and $filters['tag:סבב'] != $timeslot->round)
+			//	continue;
 			controll_set_current_object($timeslot);
 			ob_start();
-			get_template_part( 'content', 'page' );
+			the_content();
 			echo controll_parse_template($timeslot, ob_get_clean());
 			controll_set_current_object(null);
 		}
+		
 		?>
-		<?php if ($mainwidth == 10):?>
-			</div>
-		<?php endif;?>
-		</div>
-		
-		<?php if (is_active_sidebar('pageright')): ?>
-			<div class="col-md-3">
-				<?php get_sidebar('right'); ?>
-			</div>
-		<?php endif; ?>
-		
-	</div>
-</div>
+	</main><!-- #main -->
+</div><!-- #primary -->
 
 <?php get_footer(); ?>

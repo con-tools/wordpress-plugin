@@ -66,28 +66,13 @@ add_filter('wp_title', 'assignPageTitle');
 
 get_header();
 
-$mainwidth = 12;
-if (is_active_sidebar('pageright'))
-	$mainwidth -= 3;
-if (is_active_sidebar('pageleft'))
-	$mainwidth -= 3;
-if ($mainwidth > 9)
-	$mainwidth = 10; // don't let main content be too wide
 ?>
 
-<div class="container">
-	<div class="row">
-	
-		<?php if (is_active_sidebar('pageleft')): ?>
-		<div class="col-md-3">
-			<?php get_sidebar('left'); ?>
-		</div>
-		<?php endif; ?>
+<div id="primary" class="content-area">
+	<main id="main" class="site-main" role="main">
 	
 		<div class="col-md-<?php echo $mainwidth ?> registration event">
-		<?php if ($mainwidth == 10):?>
-			<div style="@media screen and (min-width: 783px) {margin-<?php echo is_rtl() ? 'right' : 'left'?>: -3.2em;}">
-		<?php endif;?>
+		
 		<?php if ($errorMessage): ?>
 		<h3>שגיאה: <?php echo $errorMessage ?></h3>
 		<?php endif; ?>
@@ -96,26 +81,18 @@ if ($mainwidth > 9)
 			<input type="hidden" name="action" value="<?php echo $formaction ?>">
 		
 		<?php
+		
 		the_post();
 		controll_set_current_object($timeslot);
 		ob_start();
-		get_template_part( 'content', 'page' );
+		the_content();
 		echo controll_parse_template($timeslot, ob_get_clean());
 		controll_set_current_object(null);
+		
 		?>
 		</form>
-		<?php if ($mainwidth == 10):?>
-			</div>
-		<?php endif;?>
-		</div>
-		
-		<?php if (is_active_sidebar('pageright')): ?>
-			<div class="col-md-3">
-				<?php get_sidebar('right'); ?>
-			</div>
-		<?php endif; ?>
-		
-	</div>
-</div>
 
+	</main><!-- #main -->
+</div><!-- #primary -->
+		
 <?php get_footer(); ?>
