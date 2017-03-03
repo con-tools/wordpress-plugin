@@ -193,7 +193,14 @@ class Controll {
 	public function timeslots() {
 		return new ConTrollTimeslots($this);
 	}
-	
+
+	/**
+	 * Get a Tickets entity handler
+	 */
+	public function locations() {
+		return new ConTrollLocations($this);
+	}
+
 	/**
 	 * Get a Tickets entity handler
 	 */
@@ -334,6 +341,27 @@ class ConTrollTimeslots {
 	}
 }
 
+class ConTrollLocations {
+	
+	/**
+	 * ConTroll API endpoint handler
+	 * @var Controll
+	 */
+	private $api;
+	
+	public function __construct(Controll $api) {
+		$this->api = $api;
+	}
+	
+	public function catalog() {
+		return $this->api->apiCall('entities/locations', $this->api->getSessionToken());
+	}
+	
+
+	public function get($id) {
+		return $this->api->apiCall("entities/locations/$id");
+	}
+}
 
 class ConTrollTickets {
 
