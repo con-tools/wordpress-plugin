@@ -14,7 +14,7 @@ class ConTrollPageTemplater {
 	protected $templates;
 	
 	/**
-	* Returns an instance of this class. 
+	* Returns an instance of this class.
 	*/
 	public static function get_instance() {
         if (!is_null(self::$instance))
@@ -42,6 +42,7 @@ class ConTrollPageTemplater {
 			'pages/page-shop.php' => 'ConTroll Shop',
 			'pages/page-timeslot-display.php' => 'ConTroll Event',
 			'pages/page-timeslot-list.php' => 'ConTroll Event List',
+			'pages/page-full-om.php' => 'ConTroll Object Model',
 		];
 	}
 	
@@ -83,7 +84,7 @@ class ConTrollPageTemplater {
 		
 		echo $file;
 		return $template;
-    } 
+    }
 }
 
 add_action('plugins_loaded', ['ConTrollPageTemplater', 'get_instance']);
