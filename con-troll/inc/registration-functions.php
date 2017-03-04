@@ -6,25 +6,38 @@ $controll_bigor_rounds = [
 		'ערב' 		=> [ new DateTime("2016-06-30 20:00"), new DateTime("2016-06-31 00:00")],
 ];
 
+function controll_filters($filters, $object) {
+	if (is_null($filters))
+		return $object;
+	if (preg_match('/date\(([^\)]*)\)/', $filters, $matches)) {
+		return date($matches[1] ? $matches[1] : "d/n H:i",
+				(($object instanceof DateTime) ? 
+					$object->getTimestamp() : $object));
+	}
+	return $object;
+}
+
 function controll_data_path_lookup($path, $object) {
 	if ($path == '.') {
 		return $object;
 	}
-	if (!is_array($path))
+	if (is_string($path)) {
+		@list($path, $filters) = explode("|", $path, 2);
 		$path = explode('.', $path);
+	}
 	if (empty($path)) {
 		return $object;
 	}
 	$first = array_shift($path);
 	if (is_array($object)) {
 		if (@array_key_exists($first, $object))
-			return controll_data_path_lookup($path, $object[$first]);
+			return controll_filters($filters, controll_data_path_lookup($path, $object[$first]));
 		if ($first == "length" or $first == "size")
 			return count($object);
 	}
 	if (is_object($object) and isset($object->$first))
-		return controll_data_path_lookup($path, $object->$first);
-	return "no such field '$first'";
+		return controll_filters($filters, controll_data_path_lookup($path, $object->$first));
+	return "no such field '$first'";//" in " . print_r($object,true);
 }
 
 /**
