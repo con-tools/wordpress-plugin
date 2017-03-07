@@ -58,6 +58,18 @@ switch ($errorMessage) {
 }
 
 $tickets = controll_api()->tickets()->catalog();
+$usesPasses = controll_api()->usesPasses();
+if ($usesPasses) {
+	$passes = controll_api()->passes()->user_catalog();
+	$pending_passes = array_filter($passes, function($pass) {
+		return $pass->status == 'reserved' or $pass->status == 'processing';
+	});
+	if ($pending_passes)
+		logger()->Debug("User $email has some pending passes: " . count($pending_passes));
+	$authorized_passes = array_filter($passes, function($pass){
+		return $pass->status == 'authorized';
+	});
+}
 
 if (!empty($tickets)) {
 	$pending_tickets = array_filter($tickets, function($ticket){
@@ -85,7 +97,7 @@ if (!empty($purchases)) {
 }
 
 $coupons = controll_api()->coupons()->catalog();
-$showcart = $pending_purchases || $pending_tickets;
+$showcart = $pending_purchases || $pending_tickets || $pending_passes;
 
 get_header();
 
@@ -153,10 +165,32 @@ function disableCheckout() {
 			<h3>עגלת קניות</h3>
 			<table>
 			
-			<?php if ($pending_tickets and !empty($pending_tickets)):?>
+			<?php if ($usesPasses): ?>
 			<thead>
 				<tr>
-					<th>ארוע</th><th>סבב</th><th>כרטיסים</th><th>מחיר</th>
+					<th>כרטיס</th><th>שם</th><th>מחיר</th>
+				</tr>
+			</thead>
+			<tbody>
+				<?php foreach ($pending_passes as $pass):?>
+				<?php $total += $pass->price ?>
+				<tr>
+					<td><?php echo $pass->pass->title ?></td>
+					<td><?php echo $pass->name ?></td>
+					<td class="numeric"><?php echo $pass->price ?></td>
+					<td class="numeric">
+						<form method="post" action="?">
+							<input type="hidden" name="id" value="<?php echo $pass->id ?>">
+							<button class="fieldupd" type="submit" name="delete" value="1" title="מחק כרטיס"><span class="fa fa-trash-o"></span></button>
+						</form>
+					</td>
+				</tr>
+				<?php endforeach ?>
+			</tbody>
+			<?php elseif ($pending_tickets and !empty($pending_tickets)):?>
+			<thead>
+				<tr>
+					<th>ארוע</th><th>כרטיסים</th><th>מחיר</th>
 				</tr>
 			</thead>
 			<tbody>
@@ -167,7 +201,6 @@ function disableCheckout() {
 					<td><a href="<?php echo ConTrollSettingsPage::get_event_page_url()?>?id=<?php echo $ticket->timeslot->id?>">
 						<?php echo $ticket->timeslot->event->title?>
 					</a></td>
-					<td><?php echo $ticket->timeslot->round ?></td>
 					<td class="numeric">
 						<form method="post" action="?">
 							<input type="hidden" name="action" value="update-ticket-amount">
@@ -247,12 +280,27 @@ function disableCheckout() {
 
 		<div class="shopping-cart">
 		<table>
+		<?php if ($$authorized_passes and !empty($authorized_passes)): ?>
+			<thead>
+				<tr>
+					<th>כרטיס</th><th>שם</th>
+				</tr>
+			</thead>
+			<tbody>
+				<?php foreach ($authorized_passes as $pass):?>
+				<tr>
+					<td><?php echo $pass->pass->title ?></td>
+					<td><?php echo $pass->name ?></td>
+				</tr>
+				<?php endforeach ?>
+			</tbody>
+		<?php endif ?>
 		<?php if ($authorized_tickets and !empty($authorized_tickets)):?>
 			<?php $allowprint=true; ?>
 			<thead>
 				<tr><th colspan="3"><h3>הכרטיסים שלי</h3></th></tr>
 				<tr>
-					<th>ארוע</th><th>סבב</th><th>כרטיסים</th>
+					<th>ארוע</th><th>כרטיסים</th>
 				</tr>
 			</thead>
 			<tbody>
@@ -262,7 +310,6 @@ function disableCheckout() {
 					<td><a href="<?php echo ConTrollSettingsPage::get_event_page_url()?>?id=<?php echo $ticket->timeslot->id?>">
 						<?php echo $ticket->timeslot->event->title?>
 					</a></td>
-					<td><?php echo $ticket->timeslot->round ?></td>
 					<td class="numeric"><?php echo $ticket->amount ?></td>
 				</tr>
 			<?php endforeach ?>

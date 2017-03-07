@@ -105,6 +105,15 @@ add_shortcode('controll-list-repeat-1', 'controll_list_repeat');
 add_shortcode('controll-list-repeat-2', 'controll_list_repeat');
 add_shortcode('controll-list-repeat-3', 'controll_list_repeat');
 
+function controll_test($atts, $content = null) {
+	ob_start();
+	echo "<pre style=\"direction: ltr\">";
+	var_dump("test3", controll_api()->usesPasses());
+	echo "</pre>";
+	return ob_get_clean();
+}
+add_shortcode('controll-test', 'controll_test'); 
+
 function helper_controll_datetime_diff(DateTime $a, DateTime $b) {
 	if ($a == $b)
 		return 0;

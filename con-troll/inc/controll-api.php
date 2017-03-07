@@ -179,6 +179,14 @@ class Controll {
 	public function getKey() {
 		return $this->key;
 	}
+		
+	public function getSettings() {
+		return $this->apiCall('entities/conventions/self')->settings;
+	}
+	
+	public function usesPasses() {
+		return $this->getSettings()->{"registration-type"} == "passes";
+	}
 
 	/**
 	 * Get a Timeslots entity handler
@@ -208,6 +216,13 @@ class Controll {
 		return new ConTrollTickets($this);
 	}
 	
+	/**
+	 * Get a passes entity handler
+	 */
+	public function passes() {
+		return new ConTrollPasses($this);
+	}
+
 	/**
 	 * Get a Coupons entity handler
 	 */
@@ -391,6 +406,28 @@ class ConTrollTickets {
 				'amount' => $amount
 		], 'PUT');
 	}
+}
+
+class ConTrollPasses {
+
+	/**
+	 * ConTroll API endpoint handler
+	 * @var Controll
+	 */
+	private $api;
+	
+	public function __construct(Controll $api) {
+		$this->api = $api;
+	}
+
+	public function catalog() {
+		return $this->api->apiCall('entities/passes');
+	}
+
+	public function user_catalog() {
+		return $this->api->apiCall('entities/userpasses', $this->api->getSessionToken());
+	}
+
 }
 
 class ConTrollCoupons {

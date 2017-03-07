@@ -37,7 +37,6 @@ get_header();
 		the_content();
 		echo controll_parse_template($com, ob_get_clean());
 		controll_set_current_object(null);
-		
 		?>
 	</main><!-- #main -->
 </div><!-- #primary -->
