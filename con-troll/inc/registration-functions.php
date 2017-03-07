@@ -66,6 +66,18 @@ function controll_get_current_object() {
 	return $_controll_current_object;
 }
 
+function controll_push_current_object($object) {
+	global $_controll_current_object_stack;
+	if (!@$_controll_current_object_stack) $_controll_current_object_stack = [];
+	array_push($_controll_current_object_stack, controll_get_current_object());
+	controll_set_current_object($object);
+}
+
+function controll_pop_current_object() {
+	global $_controll_current_object_stack;
+	controll_set_current_object(array_pop($_controll_current_object_stack));
+}
+
 function controll_parse_template($object, $text) {
 	return preg_replace_callback('/\{\{([^\}]+)\}\}/', get_controll_field_replacer($object), $text);
 }
@@ -105,14 +117,62 @@ add_shortcode('controll-list-repeat-1', 'controll_list_repeat');
 add_shortcode('controll-list-repeat-2', 'controll_list_repeat');
 add_shortcode('controll-list-repeat-3', 'controll_list_repeat');
 
-function controll_test($atts, $content = null) {
-	ob_start();
-	echo "<pre style=\"direction: ltr\">";
-	var_dump("test3", controll_api()->usesPasses());
-	echo "</pre>";
-	return ob_get_clean();
+function controll_handle_buy_pass($atts, $content = null) {
+	$atts = shortcode_atts([
+			'success-page' => null,
+			'pass-field' => 'pass',
+			'name-field' => 'name,'
+	], $atts, 'controll-handle-buy-pass');
+	
+	// Handle POST requests to implement the purchse
+
+	if (!is_numeric(@$_REQUEST[$atts['pass-field']]))
+		return;
+	
+	$passid = $_REQUEST[$atts['pass-field']];
+	$passnamef = controll_parse_template(['id' => $passid], $atts['name-field']);
+	$passname = @$_REQUEST[$passnamef];
+	if (!$passname) {
+		$errorMessage = "חובה למלא שם בעל הכרטיס";
+		return;
+	}
+	
+	$email = controll_api()->getUserEmail();
+	if (!$email) {
+		wp_redirect("http://api.con-troll.org/auth/verify?redirect-url=" .
+				urlencode("http://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]?").
+					urlencode($passnamef) . '=' . urlencode($passname) . '&' .
+					urlencode($atts['pass-field']) . '=' . urlencode($passid)
+				, 302);
+	}
+		
+	$res = controll_api()->passes()->buy($passid, $passname);
+	if ($res->status === false) {
+		$errorMessage = $res->error;
+		return;
+	}
+	
+	if (is_null($atts['success-page'])) {
+		$url = "/shopping-cart";
+	} else {
+		$url = get_permalink(get_page_by_path($atts['success-page']));
+	}
+	wp_redirect($url);
+	exit();
 }
-add_shortcode('controll-test', 'controll_test'); 
+add_shortcode('controll-handle-buy-pass', 'controll_handle_buy_pass'); 
+
+function controll_verify_auth($atts, $content = null) {
+	controll_api()->checkAuthentication();
+	//check if the user is logged in
+	$email = controll_api()->getUserEmail();
+	if (!$email) {
+		wp_redirect("http://api.con-troll.org/auth/verify?redirect-url=" .
+				urlencode("http://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]"), 302);
+		exit;
+	}
+}
+add_shortcode('controll-verify-auth', 'controll_verify_auth');
 
 function helper_controll_datetime_diff(DateTime $a, DateTime $b) {
 	if ($a == $b)
