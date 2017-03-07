@@ -27,6 +27,10 @@ switch (@$_REQUEST['action']) {
 		}
 		wp_redirect(get_permalink(), 302);
 		exit;
+	case 'cancel-pass':
+		$res = controll_api()->passes()->delete((int)$_REQUEST['id']);
+		wp_redirect(get_permalink(), 302);
+		exit;
 	case 'update-purchase-amount':
 		$amount = (int)$_REQUEST['amount'];
 		if (@$_REQUEST['delete'])
@@ -180,8 +184,9 @@ function disableCheckout() {
 					<td class="numeric"><?php echo $pass->price ?></td>
 					<td class="numeric">
 						<form method="post" action="?">
+							<input type="hidden" name="action" value="cancel-pass">
 							<input type="hidden" name="id" value="<?php echo $pass->id ?>">
-							<button class="fieldupd" type="submit" name="delete" value="1" title="מחק כרטיס"><span class="fa fa-trash-o"></span></button>
+							<button class="fieldupd small" type="submit" name="delete" value="1" title="מחק כרטיס"><span class="fa fa-trash-o"></span></button>
 						</form>
 					</td>
 				</tr>
@@ -209,8 +214,8 @@ function disableCheckout() {
 								onkeyup="return disableCheckout()" name="amount" min="0"
 								max="<?php echo $ticket->amount + $ticket->timeslot->available_tickets ?>"
 								value="<?php echo $ticket->amount ?>">
-							<button class="fieldupd" type="submit" name="update" value="1" title="עדכן מספר כרטיסים"><span class="fa fa-check-square-o"></span></button>
-							<button class="fieldupd" type="submit" name="delete" value="1" title="מחק כרטיס"><span class="fa fa-trash-o"></span></button>
+							<button class="fieldupd small" type="submit" name="update" value="1" title="עדכן מספר כרטיסים"><span class="fa fa-check-square-o"></span></button>
+							<button class="fieldupd small" type="submit" name="delete" value="1" title="מחק כרטיס"><span class="fa fa-trash-o"></span></button>
 						</form>
 					</td>
 					<td class="numeric"><?php echo $ticket->price ?></td>
@@ -237,8 +242,8 @@ function disableCheckout() {
 							<input type="hidden" name="sku" value="<?php echo $purchase->sku->code ?>">
 							<input type="number" onchange="return disableCheckout()" onmouseup="return disableCheckout()"
 								onkeyup="return disableCheckout()" name="amount" min="0" value="<?php echo $purchase->amount ?>">
-							<button class="fieldupd" type="submit" name="update" value="1" title="עדכן מספר מוצרים"><span class="fa fa-check-square-o"></span></button>
-							<button class="fieldupd" type="submit" name="delete" value="1" title="מחק מוצר"><span class="fa fa-trash-o"></span></button>
+							<button class="fieldupd small" type="submit" name="update" value="1" title="עדכן מספר מוצרים"><span class="fa fa-check-square-o"></span></button>
+							<button class="fieldupd small" type="submit" name="delete" value="1" title="מחק מוצר"><span class="fa fa-trash-o"></span></button>
 						</form>
 					</td>
 					<td class="numeric"><?php echo $purchase->price ?></td>
