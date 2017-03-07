@@ -427,7 +427,17 @@ class ConTrollPasses {
 	public function user_catalog() {
 		return $this->api->apiCall('entities/userpasses', $this->api->getSessionToken());
 	}
-
+	
+	public function buy($passid, $name) {
+		return $this->api->apiCall('entities/userpasses', $this->api->getSessionToken(), [
+			'pass' => $passid,
+			'name' => $name,
+		]);
+	}
+	
+	public function delete($userpassid) {
+		return $this->api->apiCall('entities/userpasses/'.$userpassid, $this->api->getSessionToken(), null, 'DELETE');
+	}
 }
 
 class ConTrollCoupons {
