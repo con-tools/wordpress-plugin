@@ -1,17 +1,18 @@
 <?php
 date_default_timezone_set("Israel");
 
-$controll_bigor_rounds = [
-		'צהריים' 	=> [ new DateTime("2016-06-30 14:00"), new DateTime("2016-06-30 18:00")],
-		'ערב' 		=> [ new DateTime("2016-06-30 20:00"), new DateTime("2016-06-31 00:00")],
-];
-
 function controll_filters($filters, $object) {
 	if (is_null($filters))
 		return $object;
+	if (preg_match('exist\(([^\)]*)\)', $filters, $matches)) {
+		return $object ? $matches[1] : "";
+	}
+	if (preg_match('unless\(([^\)]*)\)', $filters, $matches)) {
+		return $object ? "" : $matches[1];
+	}
 	if (preg_match('/date\(([^\)]*)\)/', $filters, $matches)) {
 		return date($matches[1] ? $matches[1] : "d/n H:i",
-				(($object instanceof DateTime) ? 
+				(($object instanceof DateTime) ?
 					$object->getTimestamp() : $object));
 	}
 	return $object;
@@ -53,7 +54,7 @@ function get_controll_field_replacer($object) {
 		if ($obj instanceof stdclass)
 			return print_r($obj, true);
 		return $obj;
-	}; 
+	};
 }
 
 function controll_set_current_object($object) {
@@ -160,7 +161,7 @@ function controll_handle_buy_pass($atts, $content = null) {
 	wp_redirect($url);
 	exit();
 }
-add_shortcode('controll-handle-buy-pass', 'controll_handle_buy_pass'); 
+add_shortcode('controll-handle-buy-pass', 'controll_handle_buy_pass');
 
 function controll_verify_auth($atts, $content = null) {
 	controll_api()->checkAuthentication();
@@ -193,15 +194,6 @@ function helper_controll_fake_redirect($url) {
 	return ob_get_clean();
 }
 
-function helper_controll_get_round_name($startTime) {
-	global $controll_bigor_rounds;
-	foreach ($controll_bigor_rounds as $name => $times) {
-		if ($times[0] <= $startTime and $startTime < $times[1])
-			return $name;
-	}
-	return '';
-}
-
 function helper_timeslot_fields($timeslot){
 	if (!($timeslot instanceof stdClass))
 		return $timeslot;
@@ -210,7 +202,6 @@ function helper_timeslot_fields($timeslot){
 	$end = (clone $start);
 	$end->add(new DateInterval("PT" . $timeslot->duration . "M"));
 	$timeslot->end = $end;
-	$timeslot->round = helper_controll_get_round_name($timeslot->start);
 	if (!$timeslot->available_tickets)
 		$timeslot->available_tickets = 'אין יותר מקומות';
 	return $timeslot;
