@@ -4,10 +4,10 @@ date_default_timezone_set("Israel");
 function controll_filters($filters, $object) {
 	if (is_null($filters))
 		return $object;
-	if (preg_match('exist\(([^\)]*)\)', $filters, $matches)) {
+	if (preg_match('/exist\(([^\)]*)\)/', $filters, $matches)) {
 		return $object ? $matches[1] : "";
 	}
-	if (preg_match('unless\(([^\)]*)\)', $filters, $matches)) {
+	if (preg_match('/unless\(([^\)]*)\)/', $filters, $matches)) {
 		return $object ? "" : $matches[1];
 	}
 	if (preg_match('/date\(([^\)]*)\)/', $filters, $matches)) {
