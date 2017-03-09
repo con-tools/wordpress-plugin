@@ -89,9 +89,13 @@ function controll_date_format($atts, $content = null) {
 			'format' => 'd/n H:i',
 	], $atts));
 	$date = controll_data_path_lookup($path, controll_get_current_object());
-	if (!($date instanceof DateTime))
-		$date = new DateTime($date);
-	return date($format, $date->getTimestamp());
+	try {
+		if (!($date instanceof DateTime))
+			$date = new DateTime($date);
+		return date($format, $date->getTimestamp());
+	} catch (Exception $e) {
+		return 'Invalid Date';
+	}
 }
 add_shortcode('controll-date-format', 'controll_date_format');
 
