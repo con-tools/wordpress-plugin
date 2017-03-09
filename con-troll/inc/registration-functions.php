@@ -53,8 +53,31 @@ function get_controll_field_replacer($object) {
 			return date("d/n H:i", $obj->getTimestamp());
 		if ($obj instanceof stdclass)
 			return print_r($obj, true);
-		return $obj;
+		return trim("{$obj}");
 	};
+}
+
+function controll_load_catalog($source) {
+	switch ($source) {
+		case 'timeslots': 
+			$timeslots = controll_api()->timeslots()->publicCatalog($filters);
+			$timeslots = array_map('helper_timeslot_fields', $timeslots);
+			usort($timeslots, function($a,$b){
+				$diff = helper_controll_datetime_diff($a->start, $b->start);
+				if ($diff == 0)
+					return helper_controll_datetime_diff($a->end, $b->end);
+				return $diff;
+			});
+			return $timeslots;
+		case 'locations': return controll_api()->locations()->catalog();
+		case 'passes':
+			$usesPasses = controll_api()->usesPasses();
+			if ($usesPasses) {
+				return controll_api()->passes()->catalog();
+			}
+			return [];
+		default: return [];
+	}
 }
 
 function controll_set_current_object($object) {
@@ -79,8 +102,22 @@ function controll_pop_current_object() {
 	controll_set_current_object(array_pop($_controll_current_object_stack));
 }
 
+function controll_redirect_helper($url, $code = 302) {
+	if (headers_sent()) {
+		?>
+		<p>על מנת להמשיך - <a href="<?php echo $url ?>">יש ללחוץ כאן</a></p>
+		<script>
+		window.location.href = '<?php echo $url ?>';
+		</script>
+		<?php
+	} else {
+		wp_redirect($url, $code);
+	}
+	exit();
+}
+
 function controll_parse_template($object, $text) {
-	return preg_replace_callback('/\{\{([^\}]+)\}\}/', get_controll_field_replacer($object), $text);
+	return trim(preg_replace_callback('/\{\{([^\}]+)\}\}/', get_controll_field_replacer($object), $text));
 }
 
 function controll_date_format($atts, $content = null) {
@@ -100,10 +137,16 @@ function controll_date_format($atts, $content = null) {
 add_shortcode('controll-date-format', 'controll_date_format');
 
 function controll_list_repeat($atts, $content = null) {
+	remove_filter( 'the_content', 'wpautop' );
 	extract(shortcode_atts([
 			'path' => null,
+			'source' => null,
 			'delimiter' => ' ',
 	], $atts));
+	if (!is_null($source)) { // caller doesn't have the data loaded, try to get the catalog for them
+		controll_set_current_object(controll_load_catalog($source));
+		$path = '.'; // we want to iterate over the sourced list
+	}
 	$curobj = controll_get_current_object();
 	$list = controll_data_path_lookup($path, $curobj);
 	if (!is_array($list))
@@ -111,14 +154,14 @@ function controll_list_repeat($atts, $content = null) {
 	return join($delimiter, array_map(function($item) use ($content, $curobj) {
 		controll_set_current_object($item);
 		try {
-			return controll_parse_template($item, do_shortcode($content));
+			return  str_replace(["\n","\r"],"",controll_parse_template($item, do_shortcode($content)));
 		} finally {
 			controll_set_current_object($curobj);
 		}
 	},$list));
 }
 add_shortcode('controll-list-repeat', 'controll_list_repeat');
-add_shortcode('controll-list-repeat-1', 'controll_list_repeat');
+add_shortcode('controll-list-repeat-1', 'controll_list_repeat'); // multiple copies to allow nesting
 add_shortcode('controll-list-repeat-2', 'controll_list_repeat');
 add_shortcode('controll-list-repeat-3', 'controll_list_repeat');
 
@@ -131,24 +174,29 @@ function controll_handle_buy_pass($atts, $content = null) {
 	
 	// Handle POST requests to implement the purchse
 
-	if (!is_numeric(@$_REQUEST[$atts['pass-field']]))
-		return;
+	if (@$_REQUEST['ticketpass']) {
+		list($passname, $passid) = $_SESSION['controll_daily_pass'][$_REQUEST['ticketpass']];
+	} else {
+		if (!is_numeric(@$_REQUEST[$atts['pass-field']]))
+			return;
 	
-	$passid = $_REQUEST[$atts['pass-field']];
-	$passnamef = controll_parse_template(['id' => $passid], $atts['name-field']);
-	$passname = @$_REQUEST[$passnamef];
-	if (!$passname) {
-		$errorMessage = "חובה למלא שם בעל הכרטיס";
-		return;
+		$passid = $_REQUEST[$atts['pass-field']];
+		$passnamef = controll_parse_template(['id' => $passid], $atts['name-field']);
+		$passname = @$_REQUEST[$passnamef];
+		if (!$passname) {
+			$errorMessage = "חובה למלא שם בעל הכרטיס";
+			return;
+		}
 	}
 	
 	$email = controll_api()->getUserEmail();
 	if (!$email) {
-		wp_redirect("http://api.con-troll.org/auth/verify?redirect-url=" .
-				urlencode("http://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]?").
-					urlencode($passnamef) . '=' . urlencode($passname) . '&' .
-					urlencode($atts['pass-field']) . '=' . urlencode($passid)
-				, 302);
+		$id = uniqid();
+		$_SESSION['controll_daily_pass'][$id] = [$passname, $passid];
+		$url = "http://api.con-troll.org/auth/verify?redirect-url=" .
+				urlencode("http://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]?".
+					'ticketpass=' . urlencode($id));
+		controll_redirect_helper($url);
 	}
 		
 	$res = controll_api()->passes()->buy($passid, $passname);
@@ -162,8 +210,7 @@ function controll_handle_buy_pass($atts, $content = null) {
 	} else {
 		$url = get_permalink(get_page_by_path($atts['success-page']));
 	}
-	wp_redirect($url);
-	exit();
+	controll_redirect_helper($url);
 }
 add_shortcode('controll-handle-buy-pass', 'controll_handle_buy_pass');
 
@@ -172,9 +219,8 @@ function controll_verify_auth($atts, $content = null) {
 	//check if the user is logged in
 	$email = controll_api()->getUserEmail();
 	if (!$email) {
-		wp_redirect("http://api.con-troll.org/auth/verify?redirect-url=" .
-				urlencode("http://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]"), 302);
-		exit;
+		controll_redirect_helper("http://api.con-troll.org/auth/verify?redirect-url=" .
+					urlencode("http://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]"), 302);
 	}
 }
 add_shortcode('controll-verify-auth', 'controll_verify_auth');
