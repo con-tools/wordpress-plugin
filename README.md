@@ -107,6 +107,12 @@ for each such item.
 
 The content of the short code will be parsed for ConTroll Expression Language expressions (see below for details).
 
+Please note that Wordpress does not allow nesting of multiple instances of the same short code. So if you want to use this
+short code to iterate over a list, and in each item - render an additional list using `[controll-list-repeat]`, 
+then that will not work. In order to support nested iteration, we offer multiple copies of this short code by tacking on a
+number at the end of the short code name. So to nest one list inside another, the internal list should use `[controll-list-repeat-1]`,
+and if another list should be nested in side that, use `[controll-list-repeat-2]` and so fourth.
+
 #### Attributes
 
 * `path` - The object path (see below) to the list to be iterated on. This can be `.` (a single period) if the 
@@ -134,6 +140,34 @@ For detailed descriptions of the objects provided by these sources and their fie
 * `hosting` - The list of scheduled event time slots the current user is hosting. The objects provided are `Timeslot`
   objects.
 * `purchases` - the list of merchandise purchases the user has bought. The objects provided are `Purchase` objects.
+
+### `[controll-date-format]`
+
+Deprecated - use the Expression Language `date` filter (see below)
+
+Format a date using PHP date format.
+
+#### Attributes
+
+* `path` - object path to read the date time from, under the "current object"
+* `format` - [PHP date format](http://php.net/manual/en/function.date.php) to use to render this date time
+
+### `[controll-handle-buy-pass]`
+
+Handle the daily pass purchase work flow - you must put this short code at the top of the daily pass store page.
+
+#### Attributes
+
+* `success-page` : Override the page the user will be directed to after reserving a daily pass. Defaults to
+  the ConTroll shopping cart page as specified in the ConTroll plugin settings.
+* `pass` : Override the name of the pass reservation form field that holds the pass ID to reserve. Defaults to `pass`.
+* `name-field` : Override the name of the pass reservation form field that holds the pass owner name to reserve.
+  Defaults to `name`.
+
+### `[controll-verify-auth]`
+
+Verify that the current user is logged in. Place at the top of pages that require a user to be logged in to the
+ConTroll convention management system - for example, the user's personal convention agenda page.
 
 ## ConTroll Expression Language
 
