@@ -61,7 +61,6 @@ switch ($errorMessage) {
 		break;
 }
 
-$tickets = controll_api()->tickets()->catalog();
 $usesPasses = controll_api()->usesPasses();
 if ($usesPasses) {
 	$passes = controll_api()->passes()->user_catalog();
@@ -75,6 +74,7 @@ if ($usesPasses) {
 	});
 }
 
+$tickets = controll_api()->tickets()->catalog();
 if (!empty($tickets)) {
 	$pending_tickets = array_filter($tickets, function($ticket){
 		return $ticket->status == 'reserved' or $ticket->status == 'processing';

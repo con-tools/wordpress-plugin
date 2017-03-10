@@ -107,13 +107,21 @@ class ConTrollSettingsPage
         		);
         
         add_settings_field(
-            'my_page_url',
-            "Local URL for user's page",
-            array( $this, 'my_page_url_callback' ),
-            'controll-settings',
-            'controll_settings_section_local'
-        );
-
+        		'shopping_cart_url',
+        		"Local URL for shopping cart page",
+        		array( $this, 'shopping_cart_url_callback' ),
+        		'controll-settings',
+        		'controll_settings_section_local'
+        		);
+        
+        add_settings_field(
+        		'my_page_url',
+        		"Local URL for user's page",
+        		array( $this, 'my_page_url_callback' ),
+        		'controll-settings',
+        		'controll_settings_section_local'
+        		);
+        
         add_settings_field(
             'event_page_url',
             "Local URL for event page",
@@ -180,6 +188,14 @@ class ConTrollSettingsPage
             isset( $this->api_secret ) ? esc_attr($this->api_secret) : ''
         );
     }
+    
+    public function shopping_cart_url_callback()
+    {
+    	printf(
+    			'<input type="text" id="shopping_cart_url" name="controll-plugin-settings[shopping_cart_url]" value="%s" style="width: 20em;"/>',
+    			isset( $this->settings['shopping_cart_url'] ) ? esc_attr($this->settings['shopping_cart_url']) : ''
+    			);
+    }
 
     /**
      * Get the settings option array and print one of its values
@@ -211,9 +227,23 @@ class ConTrollSettingsPage
         <?php
     }
     
+    public static function get_shopping_cart_url() {
+    	$settings = get_option('controll-plugin-settings');
+    	if (array_key_exists('shopping_cart_url', $settings))
+    		return $settings['shopping_cart_url'];
+    	if (array_key_exists('my_page_url', $settings))
+    		return $settings['my_page_url'];
+    	return '';
+    }
+    
     public static function get_my_page_url()
     {
-        return get_option('controll-plugin-settings')['my_page_url'];
+    	$settings = get_option('controll-plugin-settings');
+    	if (array_key_exists('my_page_url', $settings))
+    		return $settings['my_page_url'];
+    	if (array_key_exists('shopping_cart_url', $settings))
+    		return $settings['shopping_cart_url'];
+    	return '';
     }
     
     public static function get_event_page_url()
