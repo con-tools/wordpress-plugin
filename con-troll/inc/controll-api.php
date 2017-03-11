@@ -180,10 +180,18 @@ class Controll {
 		return $this->key;
 	}
 		
+	/**
+	 * Retrieves the convention settings
+	 * @return StdClass
+	 */
 	public function getSettings() {
 		return $this->apiCall('entities/conventions/self')->settings;
 	}
 	
+	/**
+	 * Checks whether the current convention users daily passes for registration, or allows buying tickets
+	 * @return boolean true if the convention uses daily passes
+	 */
 	public function usesPasses() {
 		return $this->getSettings()->{"registration-type"} == "passes";
 	}
@@ -191,56 +199,56 @@ class Controll {
 	/**
 	 * Get a Timeslots entity handler
 	 */
-	public function tags() {
+	public function tags() : ConTrollTags {
 		return new ConTrollTags($this);
 	}
 
 	/**
 	 * Get a Timeslots entity handler
 	 */
-	public function timeslots() {
+	public function timeslots() : ConTrollTimeslots {
 		return new ConTrollTimeslots($this);
 	}
 
 	/**
 	 * Get a Tickets entity handler
 	 */
-	public function locations() {
+	public function locations() : ConTrollLocations {
 		return new ConTrollLocations($this);
 	}
 
 	/**
 	 * Get a Tickets entity handler
 	 */
-	public function tickets() {
+	public function tickets() : ConTrollTickets {
 		return new ConTrollTickets($this);
 	}
 	
 	/**
 	 * Get a passes entity handler
 	 */
-	public function passes() {
+	public function passes() : ConTrollPasses {
 		return new ConTrollPasses($this);
 	}
 
 	/**
 	 * Get a Coupons entity handler
 	 */
-	public function coupons() {
+	public function coupons() : ConTrollCoupons {
 		return new ConTrollCoupons($this);
 	}
 	
 	/**
 	 * Get a Merchandise SKU entity handler
 	 */
-	public function merchandise() {
+	public function merchandise() : ConTrollMerchandise {
 		return new ConTrollMerchandise($this);
 	}
 
 	/**
 	 * Get a Purchases entity handler
 	 */
-	public function purchases() {
+	public function purchases() : ConTrollPurchases {
 		return new ConTrollPurchases($this);
 	}
 	
