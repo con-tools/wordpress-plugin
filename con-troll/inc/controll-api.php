@@ -420,14 +420,28 @@ class ConTrollPasses {
 		$this->api = $api;
 	}
 
+	/**
+	 * List available convention passes
+	 * @return array
+	 */
 	public function catalog() {
 		return $this->api->apiCall('entities/passes');
 	}
 
+	/**
+	 * List User's purchased passes
+	 * @return array
+	 */
 	public function user_catalog() {
 		return $this->api->apiCall('entities/userpasses', $this->api->getSessionToken());
 	}
 	
+	/**
+	 * Buy a user pass
+	 * @param int $passid ConTroll pass ID
+	 * @param string $name Peron's name to register this pass for
+	 * @return StdClass pass bought
+	 */
 	public function buy($passid, $name) {
 		return $this->api->apiCall('entities/userpasses', $this->api->getSessionToken(), [
 			'pass' => $passid,
@@ -435,8 +449,23 @@ class ConTrollPasses {
 		]);
 	}
 	
+	/**
+	 * Cancel a user's pass purchase before it is authorized
+	 * @param int $userpassid ConTroll user pass ID
+	 * @return boolean whether deletion was successful
+	 */
 	public function delete($userpassid) {
 		return $this->api->apiCall('entities/userpasses/'.$userpassid, $this->api->getSessionToken(), null, 'DELETE');
+	}
+	
+	/**
+	 * Return the list of user passes, with an additional boolean field "available" specifying if that user pass
+	 * can register for that timeslot or not
+	 * @param int $timeslotid ConTroll timeslot ID
+	 * @return array
+	 */
+	public function timeslot_availability($timeslotid) {
+		return $this->api->apiCall('entities/userpasses/'.$userpassid.'?for_timeslot='.$timeslotid, $this->api->getSessionToken());
 	}
 }
 
