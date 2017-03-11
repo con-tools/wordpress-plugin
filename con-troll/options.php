@@ -229,26 +229,35 @@ class ConTrollSettingsPage
     
     public static function get_shopping_cart_url() {
     	$settings = get_option('controll-plugin-settings');
-    	if (array_key_exists('shopping_cart_url', $settings))
-    		return $settings['shopping_cart_url'];
+    	$url = '';
+    	 if (array_key_exists('shopping_cart_url', $settings))
+    	 	$url = $settings['shopping_cart_url'];
     	if (array_key_exists('my_page_url', $settings))
-    		return $settings['my_page_url'];
-    	return '';
+    		$url =  $settings['my_page_url'];
+    	if (!empty($url) && $url[0] == '/') // host-absolute path? Lets make sure we're using full URLs
+    		$url = home_url() . $url; // if you're using relative paths, I feel for you...
+    	return $url;
     }
     
     public static function get_my_page_url()
     {
     	$settings = get_option('controll-plugin-settings');
+    	$url = '';
     	if (array_key_exists('my_page_url', $settings))
-    		return $settings['my_page_url'];
-    	if (array_key_exists('shopping_cart_url', $settings))
-    		return $settings['shopping_cart_url'];
-    	return '';
+    		$url = $settings['my_page_url'];
+    	elseif (array_key_exists('shopping_cart_url', $settings))
+    		$url = $settings['shopping_cart_url'];
+   		if (!empty($url) && $url[0] == '/') // host-absolute path? Lets make sure we're using full URLs
+   			$url = home_url() . $url; // if you're using relative paths, I feel for you...
+   		return $url;
     }
     
     public static function get_event_page_url()
     {
-        return get_option('controll-plugin-settings')['event_page_url'];
+        $url = get_option('controll-plugin-settings')['event_page_url'];
+        if (!empty($url) && $url[0] == '/') // host-absolute path? Lets make sure we're using full URLs
+        	$url = home_url() . $url; // if you're using relative paths, I feel for you...
+       	return $url;
     }
     
     public static function is_registration_active() {

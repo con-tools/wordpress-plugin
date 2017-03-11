@@ -42,7 +42,7 @@ switch (@$_REQUEST['action']) {
 		wp_redirect(get_permalink(), 302);
 		exit;
 	case 'transaction-done':
-		wp_redirect(get_permalink(), 302);
+		wp_redirect(ConTrollSettingsPage::get_my_page_url(), 302); // if its a different page, the admin wants us there, so they can have fancy DOM
 		exit;
 	case 'transaction-failed':
 		$_SESSION['error-message'] = 'התשלום נכשל: ' . @$_REQUEST['reason'];

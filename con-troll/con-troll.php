@@ -20,6 +20,12 @@ include __DIR__.'/pages.php';
 include __DIR__.'/inc/controll-api.php';
 include __DIR__.'/inc/registration-functions.php';
 
+function controll_scripts() {
+	//wp_enqueue_script('controll-api', get_template_directory_uri() . '/js/controll.js', [ 'jquery' ]);
+	wp_enqueue_script('controll-plugin-scripts', plugin_dir_url( __FILE__ ) . 'js/controll-tools.js');
+}
+add_action( 'wp_enqueue_scripts', 'controll_scripts' );
+
 function controll_api() {
 	global $controll;
 	if ($controll)

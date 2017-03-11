@@ -472,8 +472,20 @@ class ConTrollPasses {
 	 * @param int $timeslotid ConTroll timeslot ID
 	 * @return array
 	 */
-	public function timeslot_availability($timeslotid) {
-		return $this->api->apiCall('entities/userpasses/'.$userpassid.'?for_timeslot='.$timeslotid, $this->api->getSessionToken());
+	public function timeslot_availability($timeslot_id) {
+		return $this->api->apiCall('entities/userpasses?for_timeslot='.$timeslot_id, $this->api->getSessionToken());
+	}
+	
+	/**
+	 * Register a new ticket for the specified timeslot using the specified daily pass
+	 * @param int $passid ConTroll pass ID
+	 * @param int $timeslotid ConTroll timeslot ID
+	 */
+	public function register($passid, $timeslot_id) {
+		return $this->api->apiCall('entities/tickets', $this->api->getSessionToken(), [
+				'timeslot' => (int)$timeslot_id,
+				'user_passes' => $passid
+		]);
 	}
 }
 
