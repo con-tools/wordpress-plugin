@@ -26,7 +26,7 @@ function try_purchase($type, $color, $size, $amount, $allskus) {
 	
 	$res = controll_api()->purchases()->create($skucode, $amount);
 	logger()->Info("Added purchase: " . print_r($res, true));
-	wp_redirect('/registration/my-page');
+	wp_redirect(ConTrollSettingsPage::get_shopping_cart_url());
 	exit;
 }
  
