@@ -10,6 +10,10 @@ ticket and merchandise purchasing.
 1. Log in to the Wordpress site, and under Settings -> ConTroll, put in your convention's ID and secret (that
   you got from the ConTroll management system)
 1. Use the ConTroll templates and short codes in your Wordpress Pages
+1. Make sure to create the following pages and update the ConTroll settings page with their URLs:
+    * Shopping cart page
+    * User's personal agenda page (optional - if not set, the shopping cart page will be used)
+    * Single event page (used by the shopping cart page to show events)
 
 ## Templates
 
