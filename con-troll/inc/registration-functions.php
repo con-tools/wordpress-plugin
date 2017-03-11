@@ -250,6 +250,16 @@ function controll_verify_auth($atts, $content = null) {
 }
 add_shortcode('controll-verify-auth', 'controll_verify_auth');
 
+function controll_show_user($atts, $content = null) {
+	$email = controll_api()->getUserEmail();
+	if (!$email) {
+		controll_verify_auth($atts);
+	} else {
+		return controll_api()->getUserName();
+	}
+}
+add_shortcode('controll-user', 'controll_show_user');
+
 function helper_controll_datetime_diff(DateTime $a, DateTime $b) {
 	if ($a == $b)
 		return 0;

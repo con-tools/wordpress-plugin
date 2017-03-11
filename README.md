@@ -169,6 +169,12 @@ Handle the daily pass purchase work flow - you must put this short code at the t
 Verify that the current user is logged in. Place at the top of pages that require a user to be logged in to the
 ConTroll convention management system - for example, the user's personal convention agenda page.
 
+### `[controll-user]`
+
+Display details about the current user that is logged in to the ConTroll convention management system. If no user is
+currently logged in, this shortcode behaves like `[controll-verify-auth]`, but if a logged in user is logged in, 
+this shortcode will intead render the user's full name.
+
 ## ConTroll Expression Language
 
 In order to easily render ConTroll data into wordpress pages, ConTroll short codes that offer text rendering (e.g. 
