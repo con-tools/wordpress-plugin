@@ -21,33 +21,38 @@ function controll_list_repeat_int($path, $delimiter, $content) {
 	$list = controll_data_path_lookup($path, $curobj);
 	if (!is_array($list))
 		return '';
-		return join($delimiter, array_map(function($item) use ($content, $curobj) {
-			controll_push_current_object($item);
-			try {
-				return  str_replace(["\n","\r"],"",controll_parse_template($item, do_shortcode($content)));
-			} finally {
-				controll_pop_current_object();
-			}
-		},$list));
+	return join($delimiter, array_map(function($item) use ($content, $curobj) {
+		controll_push_current_object($item);
+		try {
+			return  controll_parse_template($item, do_shortcode($content));
+		} finally {
+			controll_pop_current_object();
+		}
+	},$list));
 }
 
 function controll_list_repeat($atts, $content = null) {
-	remove_filter( 'the_content', 'wpautop' );
 	extract(shortcode_atts([
 			'path' => null,
 			'source' => null,
 			'delimiter' => ' ',
+			'debug' => null,
 	], $atts));
+	$content = preg_replace(['{^\s*</p>\s*}','{^\s*<br ?/?>\s*}','{\s*<p>\s*$}','{\s*<br ?/?>\s*$}'], '', $content); // sometimes WP auto-p is very aggressive, lets ignore it
 	if (!is_null($source)) { // caller doesn't have the data loaded, try to get the catalog for them
 		try {
 			controll_push_current_object(controll_load_catalog($source));
-			return controll_list_repeat_int('.', $delimiter, $content); // we want to iterate over the sourced list
+			$res = controll_list_repeat_int('.', $delimiter, $content); // we want to iterate over the sourced list
 		} finally {
 			controll_pop_current_object();
 		}
 	} else {
-		return controll_list_repeat_int($path, $delimiter, $content);
+		$res = controll_list_repeat_int($path, $delimiter, $content);
 	}
+	if ($debug) {
+		echo json_encode($content);
+	}
+	return $res;
 }
 add_shortcode('controll-list-repeat', 'controll_list_repeat');
 add_shortcode('controll-list-repeat-1', 'controll_list_repeat'); // multiple copies to allow nesting
@@ -102,6 +107,35 @@ function controll_handle_buy_pass($atts, $content = null) {
 	controll_redirect_helper($url);
 }
 add_shortcode('controll-handle-buy-pass', 'controll_handle_buy_pass');
+
+function controll_buy_pass($atts, $content = null) {
+	$atts = shortcode_atts([
+			'success-page' => null,
+			'name-prompt' => 'שם בעל הכרטיס',
+			'confirm' => 'אישור',
+			'buy-text' => 'רכישה',
+	], $atts, 'controll-buy-pass');
+	$pass = controll_get_current_object();
+	$id = $pass->id;
+	ob_start();
+	?>
+	<button class="small" type="button" onclick="toggle_popup_in_group('buypass','#pass-form-<?php echo $id?>')">
+	<i class="fa fa-shopping-cart"></i> <?php echo $atts['buy-text']?></button>
+	<div class="pass-form" id="pass-form-<?php echo $id?>" style="display:none;position:absolute;z-index:100;">
+		<form method="post" action="<?php echo $_SERVER[REQUEST_URI]?>">
+		<input type="hidden" name="controll-action" value="buy-pass">
+		<?php if (!is_null($atts['success-page'])):?>
+		<input type="hidden" name="controll-success-page" value="<?php echo $atts['success-page']?>">
+		<?php endif;?>
+		<label><?php echo $atts['name-prompt']?>: <input name="pass-name" type="text" /></label>
+		<button class="small" name="pass-id" type="submit" value="<?php echo $id?>">
+		<i class="fa fa-check"></i> <?php echo $atts['confirm']?></button>
+		</form>
+	</div>
+	<?php
+	return ob_get_clean();
+}
+add_shortcode('controll-buy-pass', 'controll_buy_pass');
 
 function controll_verify_auth($atts, $content = null) {
 	controll_api()->checkAuthentication();

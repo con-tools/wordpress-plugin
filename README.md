@@ -52,7 +52,9 @@ registered to, passes they acquired and merchandise they bought. Additionally, i
 will also be listed in their own section - making this page a one-stop-shop for the user to get their agenda for the
 convention.
 
-This template requires no text content to be added to the page.
+This template requires no text content to be added to the page, but if any text
+is added, it will be rendered before the shopping cart HTML. It might be useful
+to put in some sort of header and explanation text there.
 
 ### Merchandise Shop
 
@@ -239,17 +241,17 @@ The default content of the dialog, which can be used as a reference example temp
 * `register-text` : override the button text for when registration is open and the user is logged in. Default: "Register".
 * `class` : CSS class to assign the button for styling
 
-### `[controll-handle-buy-pass]`
+### `[controll-buy-pass]`
 
-Handle the daily pass purchase work flow - you must put this short code at the top of the daily pass store page.
+Shows the button for buying daily passes (for use with conventions that use daily passes) with the pop up dialog that
+is used to enter the pass owner name. The button handles the buying and redirects to the *Shopping Cart Page* if there
+are no errors, to allow the user to complete the registration process
 
 #### Attributes
 
-* `success-page` : Override the page the user will be directed to after reserving a daily pass. Defaults to
-  the ConTroll shopping cart page as specified in the ConTroll plugin settings.
-* `pass` : Override the name of the pass reservation form field that holds the pass ID to reserve. Defaults to `pass`.
-* `name-field` : Override the name of the pass reservation form field that holds the pass owner name to reserve.
-  Defaults to `name`.
+* `buy-text` : Override the text on the purchase button (the button that shows the name dialog).
+* `name-prompt` : Override the text to show for the label prompting the user to enter the pass owner name
+* `conform` : Override the text of the "OK" button confirming the purchase
 
 ### `[controll-verify-auth]`
 
