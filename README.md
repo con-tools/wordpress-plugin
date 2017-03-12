@@ -13,7 +13,7 @@ ticket and merchandise purchasing.
 1. Make sure to create the following pages and update the ConTroll settings page with their URLs:
     * Shopping cart page
     * User's personal agenda page (optional - if not set, the shopping cart page will be used)
-    * Single event page (used by the shopping cart page to show events)
+    * Single event page (used by the shopping cart page to link to events)
 
 ## Templates
 
@@ -42,7 +42,7 @@ This template requires no text content to be added to the page.
 ### User Activity / Shopping Cart
 
 In order to complete payment on tickets, passes or merchandise, the ConTroll plugin offers a shopping cart page using
-the `ConTroll User Page/Cart` template. 
+the `ConTroll User Page/Cart` template.
 
 Designate a page on the website to use this template, then set up the address to this page in the ConTroll settings panel, 
 so that registration routines can direct users to that page to complete their purchases.
@@ -155,6 +155,82 @@ Format a date using PHP date format.
 
 * `path` - object path to read the date time from, under the "current object"
 * `format` - [PHP date format](http://php.net/manual/en/function.date.php) to use to render this date time
+
+### `[controll-register-button]`
+
+Show a "register for event" button on the event page or inside a `Timeslot` list item. The register button is an HTML
+button and can be customized by assigning it a CSS class using an attirbute. The button has 3 distinct modes:
+
+* *Registration disabled* - when registration is not open yet (the "*Open Registration*" checkbox in the ConTroll
+  settings panel is unchecked) the button shows "Registration is not open" and is disabled (its appearance can be
+  customized by hooking to the `:disabled` CSS pseudo-class for the button. The text for this can be customized
+  using an attribute (see below).
+* *Log in required* - when registration is open (using the "*Open Registration*" checkbox in the ConTroll settings
+  panel), but the user is not logged in to the ConTroll system, the button will be active and display the "Login"
+  text. Clicking on the button will take the user through the ConTroll log in flow. The text for this mode can be
+  customized using an attribute (see below).
+* *Register* - when registration is open (using the "*Open Registration*" checkbox in the ConTroll settings
+  panel) and the user is logged in, the button will allow the user to register for the event. The text for this mode
+  can be customized using an attribute (see below).
+
+If the convention uses ticket sales, then that's all there is to know about the register button - when the user clicks
+"Register", the button will reserve a ticket for them for that event and move them to the checkout page where they can
+either pay for their ticket or continue shopping for more stuff.
+
+If the convention uses daily passes, then the registration function should allow the user to select the pass they want
+to use for this event, or purchase a new pass - if they don't have one available. For this feature, clicking the button
+opens an HTML pop up dialog (not a window) with a list of passes already owned by the user and the option buy a new pass.
+The user then must then choose either an existing pass - if available (passes that cannot be used for the current event
+due to a timing conglict - a pass can only be used once concurrently - are shown as "unavailable") or to choose to buy
+a new pass. If they choose an available pass then a new registration ticket for this event will be created and the user
+will be forwarded to the *User Page* where they can see their new ticket. If on the other hand the user chooses to buy
+a new pass, then a new pass will be reserved for them as well as a registration ticket for the event using the new pass,
+and they will be taken to the *Shopping Cart Page* so they can complete the purchase of the new pass. Once the purchase
+is complete, the registration ticket will also automatically activate.
+
+While the pass selection dialog has some default look and text, it is expected that the editor will want to customize it
+to fit the convention web site look and language. This can be done by adding a ConTroll template as the content for the
+short code. In the content, the current object is the `Timeslot` object and in addition it offers a list of user owned
+passes as the field `passes` which contains a list of `UserPass` objects.
+
+The default content of the dialog, which can be used as a reference example template, is as follows:
+
+```
+<p>Please choose a daily pass</p>
+<table>
+<thead>
+	<tr><th>Name</th><th>Pass</th></tr>
+</thead>
+<tbody>
+[controll-list-repeat path="passes"]
+	<tr>
+		<td>{{name}}</td><td>{{pass.title}}</td>
+		<td>
+		<span style="display:{{available|exist(inline)}}{{available|unless(none)}}">
+			<button class="small" type="submit" name="pass" value="{{id}}">Register</button>
+		</span>
+		<span style="display:{{available|exist(none)}}{{available|unless(inline)}}">
+			<button class="small" disabled="disabled">Not available</button>
+		</span>
+		</td>
+	</tr>
+[/controll-list-repeat]
+</tbody>
+<tbody>
+	<tr>
+		<td><input type="text" name="pass-name" value="" placeholder="Owner name" pattern=".+" error-text="Owner name is required"></td>
+		<td><select name="pass-type">
+			[controll-list-repeat source="passes"]
+				<option value="{{id}}">{{title}}: ¤{{price}}</option>
+			[/controll-list-repeat]
+			</select></td>
+		<td><button class="controll-popup-button" type="submit" name="pass" value="new">
+			<i class="fa fa-shopping-cart"></i> Acquire a new pass
+			</button></td>
+	</tr>
+</tbody>
+</table>
+```
 
 ### `[controll-handle-buy-pass]`
 
