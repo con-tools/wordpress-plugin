@@ -42,8 +42,11 @@
 		if (!box)
 			return;
 		if (popupGroups[groupName]) {
-			hideElement(popupGroups[groupName]);
+			var oldbox = popupGroups[groupName];
+			hideElement(oldbox);
 			delete popupGroups[groupName];
+			if (oldbox == box) // we're hiding the previously opened box, so the "toglle" is basically done
+				return;
 		}
 		if (elementVisible(box)) {
 			hideElement(box);
@@ -65,4 +68,5 @@
 		}
 		return true;
 	};
+	
 })(window,document);
