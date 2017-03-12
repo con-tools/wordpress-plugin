@@ -126,10 +126,9 @@ add_shortcode('controll-user', 'controll_show_user');
 
 function controll_register_button($atts, $content = null) {
 	$atts = shortcode_atts([
-			'inactive-text' => 'ההרשמה לא פעילה',
-			'login-text' => 'כניסה למערכת ההרשמה',
-			'register-text' => 'הרשמה',
-			'unavailable-text' => 'תפוס',
+			'inactive-text' => "Registration isn't open",
+			'login-text' => 'Login',
+			'register-text' => 'Register',
 			'class' => null,
 	], $atts, 'controll-register-button');
 	$timeslot = controll_get_current_object();

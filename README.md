@@ -232,6 +232,13 @@ The default content of the dialog, which can be used as a reference example temp
 </table>
 ```
 
+#### Attributes
+
+* `inactive-text` : override the button text for when registration isn't open. Default: "Registration isn't open".
+* `login-text` : override the button text for when registration is open and user isn't logged in. Default: "Login"
+* `register-text` : override the button text for when registration is open and the user is logged in. Default: "Register".
+* `class` : CSS class to assign the button for styling
+
 ### `[controll-handle-buy-pass]`
 
 Handle the daily pass purchase work flow - you must put this short code at the top of the daily pass store page.
