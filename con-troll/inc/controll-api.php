@@ -98,6 +98,10 @@ class Controll {
 		return false;
 	}
 	
+	public function logout() {
+		return $this->apiCall('/auth/logout', $this->getSessionToken());
+	}
+	
 	/**
 	 * return all public records for the con
 	 */
