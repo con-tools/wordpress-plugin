@@ -51,3 +51,8 @@ function controll_redirect_helper($url, $code = 302) {
 	}
 	exit();
 }
+
+function controll_render_template($file, $args = []) {
+	extract($args);
+	include __DIR__.DIRECTORY_SEPARATOR.'templates'.DIRECTORY_SEPARATOR.$file;
+}
