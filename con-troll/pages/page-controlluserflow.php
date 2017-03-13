@@ -7,15 +7,20 @@
 $template = null;
 $text = null;
 
+function controll_replace_content_text($content) {
+	global $replace_content_text;
+	return $replace_content_text;
+}
+
 switch ($_REQUEST['action']) {
 	case 'register':
 		$template = 'register-user.php';
 		break;
 	case 'completeregister':
-		$name = @$_REQUEST['name'];
+		$name = @$_REQUEST['controll-register-name'];
 		$email = @$_REQUEST['email'];
-		$password1 = @$_REQUEST['password-register'];
-		$password2 = @$_REQUEST['password-confirm'];
+		$password1 = @$_REQUEST['controll-register-password-register'];
+		$password2 = @$_REQUEST['controll-register-password-confirm'];
 		if (!trim($name)) {
 			$template = [ 'register-user.php', [
 					'error' => "יש למלא את השם"
@@ -39,6 +44,14 @@ switch ($_REQUEST['action']) {
 		} else {
 			$template = 'register-success.php';
 		}
+		break;
+	case 'do-login':
+		controll_verify_auth([]);
+		$text = "<p>נכנסת בהצלחה!</p>";
+		break;
+	case 'logout':
+		controll_api()->logout();
+		$text = '<p>התנתקת מהמערכת</p>';
 		break;
 	case 'needreset':
 		ob_start();
@@ -83,9 +96,9 @@ switch ($_REQUEST['action']) {
 			<form method="POST" action="?">
 			<p>כדי להשלים את איפוס הסיסמה, יש לרשום את הסיסמה הרצויה פעמיים:</p>
 			<input type="hidden" name="action" value="resetpassword">
-			<input type="hidden" name="token" value="<?php echo $token ?>">
-			<p><label>סיסמה: <input type="password" name="password1"></label></p>
-			<p><label>אישור סיסמה: <input type="password" name="password2"></label>
+			<input type="hidden" name="controll-register-token" value="<?php echo $token ?>">
+			<p><label>סיסמה: <input type="password" name="controll-register-password1"></label></p>
+			<p><label>אישור סיסמה: <input type="password" name="controll-register-password2"></label>
 			<p><button type="submit">שלח</button></p>
 			</form>
 			<?php
@@ -93,9 +106,9 @@ switch ($_REQUEST['action']) {
 		$text = ob_get_clean();
 		break;
 	case 'resetpassword':
-		$token = @$_REQUEST['token'];
-		$password1 = @$_REQUEST['password1'];
-		$password2 = @$_REQUEST['password2'];
+		$token = @$_REQUEST['controll-register-token'];
+		$password1 = @$_REQUEST['controll-register-password1'];
+		$password2 = @$_REQUEST['controll-register-password2'];
 		ob_start();
 		if (!$token) {
 			?>
@@ -127,60 +140,24 @@ switch ($_REQUEST['action']) {
 
 get_header();
 
-$mainwidth = 12;
-if (is_active_sidebar('pageright'))
-	$mainwidth -= 3;
-if (is_active_sidebar('pageleft'))
-	$mainwidth -= 3;
-if ($mainwidth > 9)
-	$mainwidth = 10; // don't let main content be too wide
-?>
+if ($errorMessage) {
+	?><h3>שגיאה: <?php echo $errorMessage ?></h3><?php
+}
 
-<div class="container">
-	<div class="row">
-	
-		<?php if (is_active_sidebar('pageleft')): ?>
-		<div class="col-md-3">
-			<?php get_sidebar('left'); ?>
-		</div>
-		<?php endif; ?>
-	
-		<div class="col-md-<?php echo $mainwidth ?> registration event">
-		<?php if ($mainwidth == 10):?>
-			<div style="@media screen and (min-width: 783px) {margin-<?php echo is_rtl() ? 'right' : 'left'?>: -3.2em;}">
-		<?php endif;?>
-		
-		<?php if ($errorMessage): ?>
-		<h3>שגיאה: <?php echo $errorMessage ?></h3>
-		<?php endif; ?>
-		
-		<?php
-		if ($template) {
-			if (is_array($template)) {
-				render_template($template[0], $template[1]);
-			} else {
-				render_template($template);
-			}
-		} elseif ($text) {
-			echo $text;
-		} else {
-			the_post();
-			get_template_part( 'content', 'page' );
-		}
-		?>
-		
-		<?php if ($mainwidth == 10):?>
-			</div>
-		<?php endif;?>
-		</div>
-		
-		<?php if (is_active_sidebar('pageright')): ?>
-			<div class="col-md-3">
-				<?php get_sidebar('right'); ?>
-			</div>
-		<?php endif; ?>
-		
-	</div>
-</div>
+if ($template) {
+	ob_start();
+	if (is_array($template)) {
+		controll_render_template($template[0], $template[1]);
+	} else {
+		controll_render_template($template);
+	}
+	$replace_content_text = ob_get_clean();
+	add_filter('the_content', 'controll_replace_content_text');
+} elseif ($text) {
+	$replace_content_text = $text;
+	add_filter('the_content', 'controll_replace_content_text');
+}
 
-<?php get_footer(); ?>
+get_template_part('page');
+
+get_footer();

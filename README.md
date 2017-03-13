@@ -14,6 +14,7 @@ ticket and merchandise purchasing.
     * Shopping cart page
     * User's personal agenda page (optional - if not set, the shopping cart page will be used)
     * Single event page (used by the shopping cart page to link to events)
+1. Optional - but recommended - create a page for the user log in flow using the Controll User Login/Passwords template
 
 ## Templates
 
@@ -37,7 +38,35 @@ To integrate these workflows with your convention website, make sure to create a
 template. This page allows users who are using the username/password log in system to register, change their passwords
 or recover lost passwords.
 
-This template requires no text content to be added to the page.
+This template displays the content of the page when loaded normally, and offers work flows for log out, password registration
+and password reset using the request argument `action` and one of the suppored values.
+
+It is recommended that the content of the page will offer users links to trigger the workflows you want supported on your
+site. The following example exposes all the workflows as well as direct login using supported authentication providers:
+
+```
+[controll-if-auth]
+<a href="?action=logout">Logout</a>
+[/controll-if-auth]
+[controll-unless-auth]
+Login using:
+<div id="google"><a href="http://api.con-troll.org/auth/select/google?redirect-url=http://mysite.com/user-page/"><img src="http://api.con-troll.org/images/auth/google/btn_google_signin_dark_normal_web.png"></a></div>
+<div id="twitter"><a href="http://api.con-troll.org/auth/select/twitter?redirect-url=http://mysite.com/user-page/"><img src="http://api.con-troll.org/images/auth/twitter/twitter_login.png"></a></div>
+<div id="facebook"><a href="http://api.con-troll.org/auth/select/facebook?redirect-url=http://mysite.com/user-page/"><img src="http://api.con-troll.org/images/auth/facebook/facebook-login-with.png"></a></div>
+
+Or with an email and password:
+<form method="post" action="http://api.con-troll.org/auth/signin" id="password-auth">
+<input type="hidden" name="redirect-url" value="http://mysite.com/user-page/">
+<p><input type="email" name="email" id="email" placeholder="E-Mail"></p>
+<p><input type="password" name="password" id="password" placeholder="Password"></p>
+<p><button class="small" type="submit">כניסה</button></p>
+</form>
+
+<a href="?action=register">Register as a new user with email and password</a>
+
+<a href="?action=needreset">Reset password</a>
+[/controll-unless-auth]
+```
 
 ### User Activity / Shopping Cart
 
@@ -263,6 +292,16 @@ ConTroll convention management system - for example, the user's personal convent
 Display details about the current user that is logged in to the ConTroll convention management system. If no user is
 currently logged in, this shortcode behaves like `[controll-verify-auth]`, but if a logged in user is logged in, 
 this shortcode will intead render the user's full name.
+
+### `[controll-if-auth]`
+
+Render the content inside this short  code, if the user is logged in to the ConTroll convention management system.
+This is a good tag to use for the logout button (using the ConTroll user flow page template).
+
+## `[controll-unless-auth]`
+
+Render the content inside this short  code, if the user is not logged in to the ConTroll convention management system.
+This is a good tag to use for giving users options to log in.
 
 ## ConTroll Expression Language
 

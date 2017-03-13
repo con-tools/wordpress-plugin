@@ -148,6 +148,22 @@ function controll_verify_auth($atts, $content = null) {
 }
 add_shortcode('controll-verify-auth', 'controll_verify_auth');
 
+function controll_if_auth($atts, $content = null) {
+	controll_api()->checkAuthentication();
+	if (controll_api()->getUserEmail()) {
+		return do_shortcode($content);
+	}
+}
+add_shortcode('controll-if-auth', 'controll_if_auth');
+
+function controll_unless_auth($atts, $content = null) {
+	controll_api()->checkAuthentication();
+	if (!controll_api()->getUserEmail()) {
+		return do_shortcode($content);
+	}
+}
+add_shortcode('controll-unless-auth', 'controll_unless_auth');
+
 function controll_show_user($atts, $content = null) {
 	$email = controll_api()->getUserEmail();
 	if (!$email) {
