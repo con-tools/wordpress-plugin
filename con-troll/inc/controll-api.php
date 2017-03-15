@@ -418,6 +418,10 @@ class ConTrollTickets {
 				'amount' => $amount
 		], 'PUT');
 	}
+	
+	public function cancel($ticket_id) {
+		return $this->api->apiCall('entities/tickets/'.$ticket_id, $this->api->getSessionToken(), null, 'DELETE');
+	}
 }
 
 class ConTrollPasses {
