@@ -95,7 +95,7 @@ if (ConTrollSettingsPage::is_registration_active()) {
 	// handle form submit
 	switch (@$_REQUEST['action']) {
 		case 'login':
-			wp_redirect("http://api.con-troll.org/auth/verify?redirect-url=" .
+			wp_redirect(ConTrollSettingsPage::get_register_page_url() . "?redirect-url=" .
 					urlencode($thisPageURL), 302);
 			exit;
 		case 'register':

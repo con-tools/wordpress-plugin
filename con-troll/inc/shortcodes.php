@@ -87,7 +87,7 @@ function controll_handle_buy_pass($atts, $content = null) {
 	if (!$email) {
 		$id = uniqid();
 		$_SESSION['controll_daily_pass'][$id] = [$passname, $passid];
-		$url = "http://api.con-troll.org/auth/verify?redirect-url=" .
+		$url = ConTrollSettingsPage::get_register_page_url() . "?redirect-url=" .
 				urlencode("http://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]?".
 						'ticketpass=' . urlencode($id));
 				controll_redirect_helper($url);
@@ -142,7 +142,7 @@ function controll_verify_auth($atts, $content = null) {
 	//check if the user is logged in
 	$email = controll_api()->getUserEmail();
 	if (!$email) {
-		controll_redirect_helper("http://api.con-troll.org/auth/verify?redirect-url=" .
+		controll_redirect_helper(ConTrollSettingsPage::get_register_page_url() . "?redirect-url=" .
 				urlencode("http://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]"), 302);
 	}
 }
@@ -214,3 +214,52 @@ function controll_register_button($atts, $content = null) {
 	return ob_get_clean();
 }
 add_shortcode('controll-register-button', 'controll_register_button');
+
+function controll_delete_ticket($atts, $content = null) {
+	$atts = shortcode_atts([
+	], $atts, 'controll-delete-ticket');
+	$ticket = controll_get_current_object();
+	if (!$ticket)
+		return;
+	ob_start();
+	?>
+	<button class="small" type="submit" name="ticket-id" value="<?php echo $ticket->id?>" title="מחק כרטיס"
+		onclick="return confirm('לבטל את הכרטיס ל<?php echo $ticket->timeslot->event->title?>?');">
+		<span class="fa fa-trash-o"></span>
+	</button>
+	<?php
+	return ob_get_clean();
+}
+add_shortcode('controll-delete-ticket', 'controll_delete_ticket');
+
+function controll_login_link($atts, $content = null) {
+	$atts = shortcode_atts([
+			'provider' => null,
+			'default-page' => ConTrollSettingsPage::get_my_page_url(),
+	], $atts, 'controll-login-link');
+	$url = @$_REQUEST['redirect-url'] ?? $atts['default-page'];
+	ob_start();
+	?><a href="http://api.con-troll.org/auth/select/<?php echo $atts['provider']?>?redirect-url=<?php echo urlencode($url)?>"><?php
+	echo do_shortcode($content);
+	?></a><?php
+	return ob_get_clean();
+}
+add_shortcode('controll-login-link', 'controll_login_link');
+
+function controll_login_form($atts, $content = null) {
+	$atts = shortcode_atts([
+			'default-page' => ConTrollSettingsPage::get_my_page_url(),
+	], $atts, 'controll-login-link');
+	$url = @$_REQUEST['redirect-url'] ?? $atts['default-page'];
+	ob_start();
+	?>
+	<form method="post" action="http://api.con-troll.org/auth/signin" id="password-auth">
+	<input type="hidden" name="redirect-url" value="<?php echo $url?>">
+	<?php
+	echo do_shortcode($content);
+	?>
+	</form>
+	<?php
+	return ob_get_clean();
+}
+add_shortcode('controll-login-form', 'controll_login_form');

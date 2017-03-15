@@ -11,7 +11,7 @@ controll_api()->checkAuthentication();
 //check if the user is logged in
 $email = controll_api()->getUserEmail();
 if (!$email) {
-	wp_redirect("http://api.con-troll.org/auth/verify?redirect-url=" .
+	wp_redirect(ConTrollSettingsPage::get_register_page_url() . "?redirect-url=" .
 			urlencode("http://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]"), 302);
 	exit;
 }

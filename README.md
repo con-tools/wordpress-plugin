@@ -50,17 +50,16 @@ site. The following example exposes all the workflows as well as direct login us
 [/controll-if-auth]
 [controll-unless-auth]
 Login using:
-<div id="google"><a href="http://api.con-troll.org/auth/select/google?redirect-url=http://mysite.com/user-page/"><img src="http://api.con-troll.org/images/auth/google/btn_google_signin_dark_normal_web.png"></a></div>
-<div id="twitter"><a href="http://api.con-troll.org/auth/select/twitter?redirect-url=http://mysite.com/user-page/"><img src="http://api.con-troll.org/images/auth/twitter/twitter_login.png"></a></div>
-<div id="facebook"><a href="http://api.con-troll.org/auth/select/facebook?redirect-url=http://mysite.com/user-page/"><img src="http://api.con-troll.org/images/auth/facebook/facebook-login-with.png"></a></div>
+<div id="google">[controll-login-link provider="google"]<img src="http://api.con-troll.org/images/auth/google/btn_google_signin_dark_normal_web.png">[/controll-login-link]</div>
+<div id="twitter">[controll-login-link provider="twitter"]<img src="http://api.con-troll.org/images/auth/twitter/twitter_login.png">[/controll-login-link]</div>
+<div id="facebook">[controll-login-link provider="facebook"]<img src="http://api.con-troll.org/images/auth/facebook/facebook-login-with.png">[/controll-login-link]</div>
 
 Or with an email and password:
-<form method="post" action="http://api.con-troll.org/auth/signin" id="password-auth">
-<input type="hidden" name="redirect-url" value="http://mysite.com/user-page/">
+[controll-login-form]
 <p><input type="email" name="email" id="email" placeholder="E-Mail"></p>
 <p><input type="password" name="password" id="password" placeholder="Password"></p>
 <p><button class="small" type="submit">כניסה</button></p>
-</form>
+[/controll-login-form]
 
 <a href="?action=register">Register as a new user with email and password</a>
 
@@ -302,6 +301,36 @@ This is a good tag to use for the logout button (using the ConTroll user flow pa
 
 Render the content inside this short  code, if the user is not logged in to the ConTroll convention management system.
 This is a good tag to use for giving users options to log in.
+
+## `[controll-login-link]`
+
+Helper shortcode to create a link for letting a user log in using ConTroll and
+a supported third-party authentication provider. Use this shortcode instead of an
+`<a>` tag - the shortcode will automatically construct the correct ConTroll auth
+URL and supports a `redirect-url` query string parameter as sent by some other
+ConTroll automated login processes.
+
+### Attributes
+
+* `provider` : The third-party authentication provider that will be used to handle
+  the user authentication. Currently supported valid values: "`google`",
+  "`facebook`" and "`twitter`"
+* `default-page` : the page to move the user to when authentication is completed,
+  if `redirect-url` is not set (i.e. not as part of the ConTroll automatic login
+  process). Default to the "user page" configured in the ConTroll settings.
+
+## `[controll-login-form]`
+
+Helper shortcode to create a username/password login form for use with ConTroll
+password logins. Use this shortcode instead of a `<form>` tag - the shortcode will
+automatically construct the correct ConTroll auth URL and supports a `redirect-url`
+query string paramater as sent by some other ConTroll automated login processes.
+
+### Attributes
+
+* `default-page` : the page to move the user to when authentication is completed,
+  if `redirect-url` is not set (i.e. not as part of the ConTroll automatic login
+  process). Default to the "user page" configured in the ConTroll settings.
 
 ## ConTroll Expression Language
 

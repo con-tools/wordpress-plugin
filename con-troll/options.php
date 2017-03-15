@@ -121,14 +121,23 @@ class ConTrollSettingsPage
         		'controll-settings',
         		'controll_settings_section_local'
         		);
-        
+
         add_settings_field(
-            'event_page_url',
-            "Local URL for event page",
-            array( $this, 'event_page_url_callback' ),
-            'controll-settings',
-            'controll_settings_section_local'
-        );
+        		'event_page_url',
+        		"Local URL for event page",
+        		array( $this, 'event_page_url_callback' ),
+        		'controll-settings',
+        		'controll_settings_section_local'
+        		);
+        
+
+        add_settings_field(
+        		'register_page_url',
+        		"Local URL for the user's login page (default: use ConTroll built-in login dialog)",
+        		array( $this, 'register_page_url_callback' ),
+        		'controll-settings',
+        		'controll_settings_section_local'
+        		);
         
         add_settings_section(
         		'controll_settings_section_registration', // ID
@@ -213,9 +222,20 @@ class ConTrollSettingsPage
      */
     public function event_page_url_callback()
     {
+    	printf(
+    			'<input type="text" id="event_page_url" name="controll-plugin-settings[event_page_url]" value="%s" style="width: 20em;"/>',
+    			isset( $this->settings['event_page_url'] ) ? esc_attr($this->settings['event_page_url']) : ''
+    			);
+    }
+    
+    /**
+     * Get the settings option array and print one of its values
+     */
+    public function register_page_url_callback()
+    {
         printf(
-            '<input type="text" id="event_page_url" name="controll-plugin-settings[event_page_url]" value="%s" style="width: 20em;"/>',
-            isset( $this->settings['event_page_url'] ) ? esc_attr($this->settings['event_page_url']) : ''
+            '<input type="text" id="register_page_url" name="controll-plugin-settings[register_page_url]" value="%s" style="width: 20em;"/>',
+            isset( $this->settings['register_page_url'] ) ? esc_attr($this->settings['register_page_url']) : ''
         );
     }
     
@@ -251,13 +271,23 @@ class ConTrollSettingsPage
    			$url = home_url() . $url; // if you're using relative paths, I feel for you...
    		return $url;
     }
-    
+
     public static function get_event_page_url()
     {
-        $url = get_option('controll-plugin-settings')['event_page_url'];
-        if (!empty($url) && $url[0] == '/') // host-absolute path? Lets make sure we're using full URLs
-        	$url = home_url() . $url; // if you're using relative paths, I feel for you...
-       	return $url;
+    	$url = get_option('controll-plugin-settings')['event_page_url'];
+    	if (!empty($url) && $url[0] == '/') // host-absolute path? Lets make sure we're using full URLs
+    		$url = home_url() . $url; // if you're using relative paths, I feel for you...
+    		return $url;
+    }
+
+    public static function get_register_page_url()
+    {
+    	$url = get_option('controll-plugin-settings')['register_page_url'];
+    	if (!empty($url) && $url[0] == '/') // host-absolute path? Lets make sure we're using full URLs
+    		$url = home_url() . $url; // if you're using relative paths, I feel for you...
+    	if (empty($url))
+    		$url = 'http://api.con-troll.org/auth/verify';
+    	return $url;
     }
     
     public static function is_registration_active() {
