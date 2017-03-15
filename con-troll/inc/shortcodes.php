@@ -236,10 +236,12 @@ function controll_login_link($atts, $content = null) {
 	$atts = shortcode_atts([
 			'provider' => null,
 			'default-page' => ConTrollSettingsPage::get_my_page_url(),
+			'class' => 'controll-login',
 	], $atts, 'controll-login-link');
 	$url = @$_REQUEST['redirect-url'] ?? $atts['default-page'];
 	ob_start();
-	?><a href="http://api.con-troll.org/auth/select/<?php echo $atts['provider']?>?redirect-url=<?php echo urlencode($url)?>"><?php
+	?><a href="http://api.con-troll.org/auth/select/<?php echo $atts['provider']?>?redirect-url=<?php echo urlencode($url)?>"
+		class="<?php echo $atts['class']?>"><?php
 	echo do_shortcode($content);
 	?></a><?php
 	return ob_get_clean();
@@ -249,11 +251,13 @@ add_shortcode('controll-login-link', 'controll_login_link');
 function controll_login_form($atts, $content = null) {
 	$atts = shortcode_atts([
 			'default-page' => ConTrollSettingsPage::get_my_page_url(),
+			'class' => 'controll-login',
 	], $atts, 'controll-login-link');
 	$url = @$_REQUEST['redirect-url'] ?? $atts['default-page'];
 	ob_start();
 	?>
-	<form method="post" action="http://api.con-troll.org/auth/signin" id="password-auth">
+	<form method="post" action="http://api.con-troll.org/auth/signin"
+		class="<?php echo $atts['class']?>" id="password-auth">
 	<input type="hidden" name="redirect-url" value="<?php echo $url?>">
 	<?php
 	echo do_shortcode($content);

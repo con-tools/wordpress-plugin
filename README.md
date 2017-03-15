@@ -318,6 +318,7 @@ ConTroll automated login processes.
 * `default-page` : the page to move the user to when authentication is completed,
   if `redirect-url` is not set (i.e. not as part of the ConTroll automatic login
   process). Default to the "user page" configured in the ConTroll settings.
+* `class` : CSS class to assign to the created tag. Defaults to `controll-login`
 
 ## `[controll-login-form]`
 
@@ -331,6 +332,7 @@ query string paramater as sent by some other ConTroll automated login processes.
 * `default-page` : the page to move the user to when authentication is completed,
   if `redirect-url` is not set (i.e. not as part of the ConTroll automatic login
   process). Default to the "user page" configured in the ConTroll settings.
+* `class` : CSS class to assign to the created tag. Defaults to `controll-login`
 
 ## ConTroll Expression Language
 
