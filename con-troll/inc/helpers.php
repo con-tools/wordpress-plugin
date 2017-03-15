@@ -9,16 +9,6 @@ function helper_controll_datetime_diff(DateTime $a, DateTime $b) {
 			return -1;
 }
 
-function helper_controll_fake_redirect($url) {
-	ob_start();
-	?>
-	<script>
-		window.location.href = "<?php echo $url ?>";
-	</script>
-	<?php
-	return ob_get_clean();
-}
-
 function helper_timeslot_fields($timeslot){
 	if (!($timeslot instanceof stdClass))
 		return $timeslot;
