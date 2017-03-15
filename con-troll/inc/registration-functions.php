@@ -48,6 +48,7 @@ function controll_handle_forms() {
 	// Choose handling by type of ConTroll form being submitted
 	switch (@$_REQUEST['controll-action']) {
 		case 'buy-pass': return controll_handler_buy_pass();
+		case 'cancel-ticket': return controll_handler_cancel_ticket();
 	}
 }
 

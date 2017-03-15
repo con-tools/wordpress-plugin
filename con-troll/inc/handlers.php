@@ -37,3 +37,14 @@ function controll_handler_buy_pass() {
 	}
 	controll_redirect_helper($url);
 }
+
+function controll_handler_cancel_ticket() {
+	if (!is_numeric(@$_REQUEST['ticket-id']))
+		return;
+	
+	controll_api()->tickets()->cancel(@$_REQUEST['ticket-id']);
+	$ref = $_SERVER['HTTP_REFERER'];
+	wp_redirect($ref);
+	print($ref);
+	exit();
+}
