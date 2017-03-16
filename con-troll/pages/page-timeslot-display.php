@@ -117,9 +117,14 @@ if (ConTrollSettingsPage::is_registration_active()) {
 
 function assignPageTitle($orig = null){
 	global $timeslot;
+	if (is_array($orig)) {// title_parts mode
+		$orig['title'] = $timeslot->event->title;
+		return $orig;
+	}
 	return $timeslot->event->title . " | " . get_bloginfo('name');
 }
-add_filter('wp_title', 'assignPageTitle',999);
+add_filter('wp_title', 'assignPageTitle',20);
+add_filter('document_title_parts', 'assignPageTitle');
 
 get_header();
 
