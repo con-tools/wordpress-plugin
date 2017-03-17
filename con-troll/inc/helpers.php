@@ -46,3 +46,12 @@ function controll_render_template($file, $args = []) {
 	extract($args);
 	include __DIR__.DIRECTORY_SEPARATOR.'templates'.DIRECTORY_SEPARATOR.$file;
 }
+
+function controll_do_shortcode($context, $content) {
+	controll_push_current_object($context);
+	try {
+		return  controll_parse_template($context, do_shortcode($content));
+	} finally {
+		controll_pop_current_object();
+	}
+}
