@@ -22,12 +22,7 @@ function controll_list_repeat_int($path, $delimiter, $content) {
 	if (!is_array($list))
 		return '';
 	return join($delimiter, array_map(function($item) use ($content, $curobj) {
-		controll_push_current_object($item);
-		try {
-			return  controll_parse_template($item, do_shortcode($content));
-		} finally {
-			controll_pop_current_object();
-		}
+		return controll_do_shortcode($item, $content);
 	},$list));
 }
 
