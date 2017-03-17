@@ -115,19 +115,44 @@ if (ConTrollSettingsPage::is_registration_active()) {
 	$timeslot->{'registration-active'} = false;
 }
 
-function assignPageTitle($orig = null){
-	global $timeslot;
-	if (is_array($orig)) {// title_parts mode
-		$orig['title'] = $timeslot->event->title;
+function controll_event_title($orig = null){
+	global $timeslot, $thisPageURL;
+	if (is_array($orig)) {// title_parts mode or opengraph
+		foreach ($orig as $key => $val) {
+			if (substr($key, -5) == 'title')
+				$orig[$key] = $timeslot->event->title;
+			if (substr($key, -11) == 'description') {
+				$desc_template = get_post_meta( get_the_ID(), 'controll_description', true );
+				$orig[$key] = controll_do_shortcode($timeslot,
+						empty($desc_template) ? $orig[$key] : $desc_template);
+			}
+		}
+		
+		if (array_key_exists('og:url', $orig)) // hack the opengraph URL
+			$orig['og:url'] = $thisPageURL;
+		
 		return $orig;
 	}
-	return $timeslot->event->title . " | " . get_bloginfo('name');
+	if (is_string($orig))
+		return $timeslot->event->title . " | " . get_bloginfo('name');
+	return false;
 }
-add_filter('wp_title', 'assignPageTitle',20);
-add_filter('document_title_parts', 'assignPageTitle');
+add_filter('wp_title', 'controll_event_title',20);
+add_filter('document_title_parts', 'controll_event_title');
+add_filter('jetpack_open_graph_tags', 'controll_event_title' );
+
+function controll_event_canonical($url = null) {
+	global $thisPageURL;
+	return $thisPageURL;
+}
+add_filter('wpseo_canonical', 'controll_event_canonical');
+add_filter('get_canonical_url', 'controll_event_canonical');
+
+$tmp_desc_template = get_post_meta( get_the_ID(), 'controll_description', true );
 
 get_header();
 
+print "<!-- " . $tmp_desc_template . " -->";
 ?>
 
 <div id="primary" class="content-area event-page">
