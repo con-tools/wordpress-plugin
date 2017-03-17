@@ -174,6 +174,8 @@ For detailed descriptions of the objects provided by these sources and their fie
 * `hosting` - The list of scheduled event time slots the current user is hosting. The objects provided are `Timeslot`
   objects.
 * `purchases` - the list of merchandise purchases the user has bought. The objects provided are `Purchase` objects.
+* `coupons` - the list of coupons available for the current user. This does not include coupons previously used. The
+  objects provided are `Coupon` objects.
 
 ### `[controll-date-format]`
 
@@ -547,6 +549,30 @@ events or are hosting them, and such.
 
 Fields:
 
+* `id` : The ConTroll ID for this user
 * `name` : The name of the user
 * `email` : The email address of the user
 * `phone` : The phone number for the user
+
+### Coupon
+
+Represents discount coupons available to the user for discounting purchases, tickets and passes.
+
+Fields:
+
+* `id` : The ConTroll ID for this coupon
+* `value`: The value of the coupon
+* `user`: The `User` object (see above) for the user who owns this coupon
+* `type`: The coupon type object for this coupon (see below)
+* `used`: boolean value whether this coupon has already been used (always false) 
+
+### Coupon Type
+
+Represents a class of coupons that may be awarded to users.
+
+Fields:
+
+* `id` : The ConTroll ID for this coupon type
+* `title` : The coupon type title - text specifying what type of coupon this is
+* `category` : The coupon type category title - text specifying the category of coupons this belongs to
+* `code` : coupon type code - text specifying the SKU code or some other code associated with this type of coupons

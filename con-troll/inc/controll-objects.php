@@ -101,6 +101,10 @@ function controll_load_catalog($source) {
 			return array_filter(controll_api()->purchases()->catalog(), function($purchase){
 				return $purchase->status == 'authorized';
 			});
+		case 'coupons':
+			return array_filter(controll_api()->coupons()->catalog(), function($coupon){
+				return !$coupon->used;
+			});
 		default: return [];
 	}
 }
