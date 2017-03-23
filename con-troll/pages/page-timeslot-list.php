@@ -27,10 +27,10 @@ $query = array_reduce(array_map(function($part){
 	return $query;
 }, []);
 foreach ($query as $key => $value) {
-	if (strpos($key, "tag:") !== 0)
-		continue;
-	if ($value)
+	if (strpos($key, "tag:") === 0)
 		$filters[$key] = $value;
+	if (strpos($key, "by_") === 0)
+		$filters[substr($key, 3)] = $value;
 }
 logger()->Info("Filtering by ".print_r($filters, true));
 
@@ -45,7 +45,7 @@ usort($timeslots, function($a,$b){
 get_header();
 
 ?>
-
+<!-- <?php echo "Filtering by ".print_r($filters, true);?> -->
 <div id="primary" class="content-area event-list">
 	<main id="main" class="site-main" role="main">
 		
