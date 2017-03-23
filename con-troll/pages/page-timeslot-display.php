@@ -165,8 +165,8 @@ print "<!-- " . $tmp_desc_template . " -->";
 		<?php endif; ?>
 		
 		<form name="registration" method="post" action="?<?php echo $_SERVER['QUERY_STRING'] ?>" onsubmit="registration_submit_callback(event)">
-			<input type="hidden" name="id" value="<?php echo $timeslot->id ?>">
-			<input type="hidden" name="action" value="<?php echo $formaction ?>">
+			<input type="hidden" name="id" value="<?php echo $timeslot->id ?>"> <?php /* Change to timeslot-id */?>
+			<input type="hidden" name="action" value="<?php echo $formaction ?>"> <?php /* change to controll-action */?>
 		
 		<?php
 		
