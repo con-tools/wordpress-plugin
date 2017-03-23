@@ -89,6 +89,18 @@ get_header();
 		</select>
 		</div>
 		
+		<div class="filter-element">
+		<label for="genre">מגבלת גיל:</label>
+		<select id="genre" name="tag:מגבלת גיל" onchange="return this.form.submit();">
+			<option value="">הכל</option>
+			<?php foreach ($tags["מגבלת גיל"] as $value):?>
+			<option value="<?php echo $value?>" <?php
+				if ($filters['tag:מגבלת גיל'] == $value) {?>selected="selected"<?php }
+				?>><?php echo $value?></option>
+			<?php endforeach;?>
+		</select>
+		</div>
+		
 		</form>
 		
 		<?php
