@@ -28,9 +28,23 @@ class Controll {
 	 */
 	private $user_data = null;
 	
+	private $async = false;
+	
 	public function __construct($api_key, $secret) {
 		$this->key = $api_key;
 		$this->secret = $secret;
+	}
+	
+	public function async() : Controll {
+		$this->async = [
+				'master' => curl_multi_init(),
+				'options' => [
+						CURLOPT_RETURNTRANSFER => true,
+						CURLOPT_FOLLOWLOCATION => true,
+						CURLOPT_MAXREDIRS => 5
+				],
+		];
+		return $this;
 	}
 	
 	/**
@@ -265,6 +279,14 @@ class Controll {
 		if ($res === false)
 			return false; // 404?
 		return json_decode($res);
+	}
+	
+	private function asyncCall($url) {
+		$ch = curl_init();
+		$options = array_merge($this->async['options'], [ CURLOPT_URL => $urls ]);
+		curl_setopt_array($ch, $options);
+		curl_multi_add_handle($master, $ch);
+		curl_multi_exec($master, $running);
 	}
 	
 	private function getAuthorizedStreamContext($token, $data = null, $method = null) {
