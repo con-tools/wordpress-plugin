@@ -21,12 +21,15 @@ add_action( 'the_post', 'controll_show_errors' );
  * This function never returns.
  * @param array $data
  */
-function controll_auth_with_data($data) {
-	$id = uniqid();
-	$_SESSION['controll-auth-with-data-' . $id] = $data;
-	$url = "http://api.con-troll.org/auth/verify?redirect-url=" .
-			urlencode("http://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]?".
-					'controll-auth-data=' . urlencode($id));
+function controll_authorize($data = null) {
+	if (!is_null($data)) {
+		$id = uniqid();
+		$_SESSION['controll-auth-with-data-' . $id] = $data;
+		$callbackdata = '?controll-auth-data=' . urlencode($id);
+	} else
+		$callbackdata = '';
+	$url = ConTrollSettingsPage::get_register_page_url() . '?redirect-url=' .
+			urlencode("http://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]" . $callbackdata);
 	controll_redirect_helper($url);
 }
 
@@ -49,6 +52,8 @@ function controll_handle_forms() {
 	switch (@$_REQUEST['controll-action']) {
 		case 'buy-pass': return controll_handler_buy_pass();
 		case 'cancel-ticket': return controll_handler_cancel_ticket();
+		case 'login': controll_authorize();
+		case 'register-ticket': controll_handle_registration();
 	}
 }
 
