@@ -57,6 +57,11 @@ function get_controll_field_replacer($object) {
 }
 
 function controll_load_catalog($source) {
+	global $_controll_source_cache;
+	if (!isset($_controll_source_cache))
+		$_controll_source_cache = [];
+	if (isset($_controll_source_cache[$source]))
+		return $_controll_source_cache[$source];
 	switch ($source) {
 		case 'timeslots':
 			$timeslots = controll_api()->timeslots()->publicCatalog($filters);
@@ -67,25 +72,25 @@ function controll_load_catalog($source) {
 					return helper_controll_datetime_diff($a->end, $b->end);
 					return $diff;
 			});
-				return $timeslots;
+			return $_controll_source_cache[$source] = $timeslots;
 		case 'locations':
-			return controll_api()->locations()->catalog();
+			return $_controll_source_cache[$source] = controll_api()->locations()->catalog();
 		case 'passes':
 			$usesPasses = controll_api()->usesPasses();
 			if ($usesPasses) {
-				return controll_api()->passes()->catalog();
+				return $_controll_source_cache[$source] = controll_api()->passes()->catalog();
 			}
 			return [];
 		case 'user-passes':
 			$usesPasses = controll_api()->usesPasses();
 			if ($usesPasses) {
-				return $authorized_passes = array_filter(controll_api()->passes()->user_catalog(), function($pass){
+				return $_controll_source_cache[$source] = array_filter(controll_api()->passes()->user_catalog(), function($pass){
 					return $pass->status == 'authorized';
 				});
 			}
 			return [];
 		case 'tickets':
-			return array_filter(controll_api()->tickets()->catalog(), function($ticket){
+			return $_controll_source_cache[$source] = array_filter(controll_api()->tickets()->catalog(), function($ticket){
 				return $ticket->status == 'authorized';
 			});
 		case 'hosting':
@@ -96,13 +101,13 @@ function controll_load_catalog($source) {
 					return helper_controll_datetime_diff($a->end, $b->end);
 					return $diff;
 			});
-				return $hosting;
+			return $_controll_source_cache[$source] = $hosting;
 		case 'purchases':
-			return array_filter(controll_api()->purchases()->catalog(), function($purchase){
+			return $_controll_source_cache[$source] = array_filter(controll_api()->purchases()->catalog(), function($purchase){
 				return $purchase->status == 'authorized';
 			});
 		case 'coupons':
-			return array_filter(controll_api()->coupons()->catalog(), function($coupon){
+			return $_controll_source_cache[$source] = array_filter(controll_api()->coupons()->catalog(), function($coupon){
 				return !$coupon->used;
 			});
 		default: return [];
