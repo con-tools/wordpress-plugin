@@ -471,7 +471,7 @@ class ConTrollPasses {
 	 * @return array
 	 */
 	public function user_catalog() {
-		return $this->api->apiCall('entities/userpasses', $this->api->getSessionToken());
+		return $this->api->apiCall('entities/userpasses?valid=1', $this->api->getSessionToken());
 	}
 	
 	/**
