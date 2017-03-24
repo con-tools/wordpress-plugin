@@ -116,6 +116,10 @@ class Controll {
 		return $this->apiCall('/auth/logout', $this->getSessionToken());
 	}
 	
+	public function verify() {
+		return $this->apiCall('/auth/verify', $this->getSessionToken());
+	}
+	
 	/**
 	 * return all public records for the con
 	 */
