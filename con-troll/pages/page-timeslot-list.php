@@ -27,6 +27,7 @@ $query = array_reduce(array_map(function($part){
 	return $query;
 }, []);
 foreach ($query as $key => $value) {
+	if ($value == "") continue; // don't send filters with no value
 	if (strpos($key, "tag:") === 0)
 		$filters[$key] = $value;
 	if (strpos($key, "by_") === 0)

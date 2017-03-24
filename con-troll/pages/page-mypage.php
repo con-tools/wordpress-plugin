@@ -16,7 +16,7 @@ if (!$email) {
 	exit;
 }
 
-switch (@$_REQUEST['action']) {
+switch (@$_REQUEST['controll-action']) {
 	case 'update-ticket-amount':
 		$amount = (int)$_REQUEST['amount'];
 		if (@$_REQUEST['delete'])
@@ -184,7 +184,7 @@ function disableCheckout() {
 					<td class="numeric"><?php echo $pass->price ?></td>
 					<td class="numeric">
 						<form method="post" action="?">
-							<input type="hidden" name="action" value="cancel-pass">
+							<input type="hidden" name="controll-action" value="cancel-pass">
 							<input type="hidden" name="id" value="<?php echo $pass->id ?>">
 							<button class="fieldupd small" type="submit" name="delete" value="1" title="מחק כרטיס"><span class="fa fa-trash-o"></span></button>
 						</form>
@@ -208,7 +208,7 @@ function disableCheckout() {
 					</a></td>
 					<td class="numeric">
 						<form method="post" action="?">
-							<input type="hidden" name="action" value="update-ticket-amount">
+							<input type="hidden" name="controll-action" value="update-ticket-amount">
 							<input type="hidden" name="id" value="<?php echo $ticket->id ?>">
 							<input type="number" onchange="return disableCheckout()" onmouseup="return disableCheckout()"
 								onkeyup="return disableCheckout()" name="amount" min="0"
@@ -237,7 +237,7 @@ function disableCheckout() {
 					<td colspan="2"><a href="/shirts/buy"><?php echo $purchase->sku->title?></a></td>
 					<td class="numeric">
 						<form method="post" action="?">
-							<input type="hidden" name="action" value="update-purchase-amount">
+							<input type="hidden" name="controll-action" value="update-purchase-amount">
 							<input type="hidden" name="updatetype" value="purchase">
 							<input type="hidden" name="sku" value="<?php echo $purchase->sku->code ?>">
 							<input type="number" onchange="return disableCheckout()" onmouseup="return disableCheckout()"

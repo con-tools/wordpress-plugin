@@ -28,8 +28,9 @@ function controll_authorize($data = null) {
 		$callbackdata = '?controll-auth-data=' . urlencode($id);
 	} else
 		$callbackdata = '';
+	@list($uri,$query) = explode('?',$_SERVER[REQUEST_URI]);
 	$url = ConTrollSettingsPage::get_register_page_url() . '?redirect-url=' .
-			urlencode("http://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]" . $callbackdata);
+			urlencode("http://$_SERVER[HTTP_HOST]" . $uri . $callbackdata);
 	controll_redirect_helper($url);
 }
 
@@ -46,14 +47,20 @@ function controll_handle_forms() {
 			foreach ($data as $key => $val)
 				$_REQUEST[$key] = $val;
 		}
+		unset($_SESSION['controll-auth-with-data-' . $id]);
 	}
+	
+	if (controll_api()->getUserEmail() and rand(0,3) == 0)
+		controll_api()->verify(); // ping the ConTroll server to keep our auth token alive
 	
 	// Choose handling by type of ConTroll form being submitted
 	switch (@$_REQUEST['controll-action']) {
 		case 'buy-pass': return controll_handler_buy_pass();
+		case 'cancel-pass': return controll_handler_cancel_pass();
+		case 'pass-package': return controll_handler_pass_package();
 		case 'cancel-ticket': return controll_handler_cancel_ticket();
-		case 'login': controll_authorize();
-		case 'register-ticket': controll_handle_registration();
+		case 'login': return controll_authorize();
+		case 'register-ticket': return controll_handler_registration();
 	}
 }
 
