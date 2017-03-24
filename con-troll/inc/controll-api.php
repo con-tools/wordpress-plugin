@@ -3,9 +3,27 @@ ini_set('display_errors', 1);
 error_reporting(E_ALL ^ E_NOTICE);
 require_once dirname(__FILE__) . '/logentries.php';
 
-function logger() {
+$controll_request_id = uniqid("controll");
+header("Controll-Request-ID: ".$controll_request_id);
+
+function logger() : LeLogger {
 	global $log;
 	return $log;
+}
+
+function log_info($message) {
+	global $controll_request_id;
+	logger()->Info('[' . $controll_request_id . '] ' . $message);
+}
+
+function log_debug($message) {
+	global $controll_request_id;
+	logger()->Debug('[' . $controll_request_id . '] ' . $message);
+}
+
+function log_error($message) {
+	global $controll_request_id;
+	logger()->Err('[' . $controll_request_id . '] ' . $message);
 }
 
 class Controll {
@@ -68,7 +86,7 @@ class Controll {
 	 */
 	public function checkAuthentication() {
 		$token = @$_REQUEST['token'] ?: @$_REQUEST['api_token'];
-		if (!$token)
+		if (!$token or !empty(@$_SESSION['controll-user-token']))
 			return;
 		$token = $_GET['token'];
 		$user = $this->getUserData($token);
@@ -154,7 +172,7 @@ class Controll {
 			$data = $data->data; // TOOD: I really should rewrite the user record API and this client
 		if (@$data->content_type != 'application/json')
 			return false;
-		logger()->Debug("decoding " . $data->data);
+		log_debug("decoding " . $data->data);
 		return json_decode($data->data, true); // yes, silly,isn't it
 	}
 	
@@ -176,14 +194,14 @@ class Controll {
 				'email' => $email,
 				'redirect-url' => $url,
 		]);
-		logger()->Debug("Password reset call said: " . print_r($res, true));
+		log_debug("Password reset call said: " . print_r($res, true));
 	}
 	
 	public function setPassword($token, $password) {
 		$res = $this->apiCall('auth/passwordchange', $token, [
 				'password' => $password,
 		]);
-		logger()->Debug("Changing password with token $token, ConTroll said: " . print_r($res,true));
+		log_debug("Changing password with token $token, ConTroll said: " . print_r($res,true));
 		return is_object($res) and $res->status;
 	}
 	
@@ -194,7 +212,7 @@ class Controll {
 				'name' => $name,
 		]);
 		if (!is_object($res) or $res->status === false)
-			logger()->Debug("User registration of $name <$email> failed: " . print_r($res,true));
+			log_debug("User registration of $name <$email> failed: " . print_r($res,true));
 		return is_object($res) and $res->status;
 	}
 	
@@ -275,11 +293,12 @@ class Controll {
 	}
 	
 	public function apiCall($api, $user_token = null, $data = null, $method = null) {
+		$starttime = time();
 		$res = @file_get_contents("http://api.con-troll.org/" . $api, false,
 						$this->getAuthorizedStreamContext($user_token, $data, $method));
-		logger()->Debug("Calling http://api.con-troll.org/" . $api);
+		log_debug("Calling http://api.con-troll.org/" . $api . " took " . (time() - $starttime) . "s");
 		if (strstr($_SERVER['QUERY_STRING'], 'debug-response'))
-			logger()->Debug("Controll API response to 'http://api.con-troll.org/$api': " . print_r($res, true));
+			log_debug("Controll API response to 'http://api.con-troll.org/$api': " . print_r($res, true));
 		if ($res === false)
 			return false; // 404?
 		return json_decode($res);
@@ -318,7 +337,7 @@ class Controll {
 			$headers['Authorization'] = $this->generateConventionAuth();
 		}
 		if (strstr($_SERVER['QUERY_STRING'], 'debug-response'))
-			logger()->Debug("Sending API authorization: " . $headers['Authorization'] . " with data " . print_r($http, true));
+			log_debug("Sending API authorization: " . $headers['Authorization'] . " with data " . print_r($http, true));
 		$http['header'] = '';
 		foreach ($headers as $field => $value)
 			$http['header'] .= "$field: $value\r\n";
@@ -346,7 +365,7 @@ class ConTrollTags {
 	}
 
 	public function catalog() {
-		logger()->Debug("Loading tag list");
+		log_debug("Loading tag list");
 		return $this->api->apiCall('entities/tagtypes');
 	}
 
@@ -383,7 +402,7 @@ class ConTrollTimeslots {
 	public function myHosting() {
 		$res = $this->api->apiCall('entities/timeslots?by_host=' . $this->api->getUserEmail(),'public');
 		if (!is_array($res) && $res->status === false) {
-			logger()->Err("Error getting hostings list for user ".$this->api->getUserEmail());
+			log_error("Error getting hostings list for user ".$this->api->getUserEmail());
 			return false;
 		}
 		return $res;
@@ -585,7 +604,7 @@ class ConTrollPurchases {
 				'amount' => $amount
 		], 'PUT');
 		if (!$res->status)
-			logger()->Error("Error in purchase update: " . print_r($res, true));
+			log_error("Error in purchase update: " . print_r($res, true));
 		return $res;
 	}
 }
