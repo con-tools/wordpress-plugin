@@ -7,12 +7,6 @@ require_once dirname(__FILE__) . '/default-content.php';
 require_once dirname(__FILE__) . '/shortcodes.php';
 require_once dirname(__FILE__) . '/handlers.php';
 
-// Register for POST form processing
-add_action( 'wp_loaded', 'controll_handle_forms' );
-
-// Register for error message display
-add_action( 'the_post', 'controll_show_errors' );
-
 /**
  * Auth redirect only retains the first argument (a bug in ConTroll),
  * until its fixed, support redirection with all the data by encoding it into
@@ -22,22 +16,34 @@ add_action( 'the_post', 'controll_show_errors' );
  * @param array $data
  */
 function controll_authorize($data = null) {
+	@list($uri,$query) = explode('?',$_SERVER[REQUEST_URI]);
 	if (!is_null($data)) {
 		$id = uniqid();
 		$_SESSION['controll-auth-with-data-' . $id] = $data;
 		$callbackdata = '?controll-auth-data=' . urlencode($id);
 	} else
-		$callbackdata = '';
-	@list($uri,$query) = explode('?',$_SERVER[REQUEST_URI]);
+		$callbackdata = '?' . $query; // no specific data, use the query and hope the caller knows what its doing
 	$url = ConTrollSettingsPage::get_register_page_url() . '?redirect-url=' .
 			urlencode("http://$_SERVER[HTTP_HOST]" . $uri . $callbackdata);
 	controll_redirect_helper($url);
+}
+
+function controll_verify_login_action() {
+	global $controll_request_id;
+	$require_login = get_post_meta( get_the_ID(), 'controll_require_login', true );
+	if ($require_login) {
+		log_info("Verifying log in: " . $require_login);
+		controll_verify_login();
+	}
 }
 
 // The wp_loaded action is called before headers are sent, and before Wordpress does its own query parsing
 // so its a great place for us to use PHP methods to handle our forms
 function controll_handle_forms() {
 	if (is_admin()) return; // we don't handle the admin dashboard
+	
+	global $controll_request_id;
+	log_info("Starting processing");
 	
 	if (array_key_exists('controll-auth-data', $_REQUEST)) {
 		// load redirect with auth data into the request
@@ -71,9 +77,26 @@ function controll_set_error($error_message) {
 
 function controll_show_errors($the_post) {
 	global $controll_error_message;
+	log_info("Starting rendering");
 	if (!$controll_error_message)
 		return;
 	?>
 	<h3 class="error"><?php echo $controll_error_message ?></h3>
 	<?php
 }
+
+log_info("Code loaded");
+
+// Register for POST form processing
+add_action( 'wp_loaded', 'controll_handle_forms' );
+
+// make sure a user is logged in if the page requires it
+add_action( 'the_post', 'controll_verify_login_action' );
+
+// Register for error message display
+add_action( 'the_post', 'controll_show_errors' );
+
+function controll_report_render_end() {
+	log_info("Done rendering");
+}
+add_action('get_footer', 'controll_report_render_end');
