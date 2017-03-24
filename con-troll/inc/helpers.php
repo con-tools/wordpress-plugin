@@ -29,6 +29,7 @@ function helper_timeslot_fields($timeslot){
  * @param number $code Type of HTTP redirect to do, if we can do HTTP redirect (default 302)
  */
 function controll_redirect_helper($url, $code = 302) {
+	global $controll_request_id;
 	if (headers_sent()) {
 		?>
 		<p>על מנת להמשיך - <a href="<?php echo $url ?>">יש ללחוץ כאן</a></p>
@@ -40,6 +41,15 @@ function controll_redirect_helper($url, $code = 302) {
 		wp_redirect($url, $code);
 	}
 	exit();
+}
+
+function controll_verify_login() {
+	controll_api()->checkAuthentication();
+	//check if the user is logged in
+	$email = controll_api()->getUserEmail();
+	log_info("Verify login - after con-troll");
+	if (!$email)
+		controll_authorize();
 }
 
 function controll_render_template($file, $args = []) {
