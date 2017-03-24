@@ -13,23 +13,6 @@ wp_enqueue_style( 'controll-fontawesome', 'https://maxcdn.bootstrapcdn.com/font-
 if (in_array('controll_need_auth', get_post_custom_keys(get_the_ID())))
 	controll_verify_auth([]);
 
-$timeslots = controll_api()->timeslots()->publicCatalog($filters);
-
-$timeslots = array_map('helper_timeslot_fields', $timeslots);
-usort($timeslots, function($a,$b){
-	$diff = helper_controll_datetime_diff($a->start, $b->start);
-	if ($diff == 0)
-		return helper_controll_datetime_diff($a->end, $b->end);
-		return $diff;
-});
-
-$locations = controll_api()->locations()->catalog();
-
-$usesPasses = controll_api()->usesPasses();
-if ($usesPasses) {
-	$passes = controll_api()->passes()->catalog();
-}
-
 ob_start();
 get_header();
 
@@ -37,18 +20,14 @@ get_header();
 
 <div id="primary" class="content-area">
 	<main id="main" class="site-main" role="main">
-		
-		<?php if ($errorMessage): ?>
-		<h3>שגיאה: <?php echo $errorMessage ?></h3>
-		<?php endif; ?>
-
 		<?php
 		
 		the_post();
+		log_info("Starting full OM page");
 		$com = (object)([
-				"timeslots" => $timeslots,
-				"locations" => $locations,
-				"passes" => $passes,
+				"timeslots" => controll_load_catalog('timeslots'),
+				"locations" => controll_load_catalog('locations'),
+				"passes" => controll_load_catalog('user-passes'),
 		]);
 		controll_set_current_object($com);
 		the_content();
