@@ -160,11 +160,19 @@ function controll_unless_auth($atts, $content = null) {
 add_shortcode('controll-unless-auth', 'controll_unless_auth');
 
 function controll_show_user($atts, $content = null) {
+	$atts = shortcode_atts([
+			'show' => 'name',
+	], $atts, 'controll-register-button');
 	$email = controll_api()->getUserEmail();
 	if (!$email) {
 		controll_verify_auth($atts);
 	} else {
-		return controll_api()->getUserName();
+		switch ($atts['show']) {
+			case 'email':
+				return controll_api()->getUserEmail();
+			default:
+				return controll_api()->getUserName();
+		}
 	}
 }
 add_shortcode('controll-user', 'controll_show_user');
