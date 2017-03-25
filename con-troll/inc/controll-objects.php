@@ -84,6 +84,9 @@ function controll_load_catalog($source) {
 		case 'user-passes':
 			$usesPasses = controll_api()->usesPasses();
 			if ($usesPasses) {
+				$passes = controll_api()->passes()->user_catalog();
+				if (!is_array($passes))
+					return []; // got an error, probably because there is no logged in user
 				return $_controll_source_cache[$source] = array_filter(controll_api()->passes()->user_catalog(), function($pass){
 					return $pass->status == 'authorized';
 				});
