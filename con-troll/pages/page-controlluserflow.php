@@ -37,12 +37,21 @@ switch ($_REQUEST['action']) {
 			$template = [ 'register-user.php', [
 					'error' => "יש לוודא ששני שדות הסיסמה זהים"
 			]];
-		} elseif (!controll_api()->registerUser($email, $name, $password1)) {
-			$template = [ 'register-user.php', [
-					'error' => "ארעה שגיאה לא צפויה ברישום, אנא פנה למנהל המערכת"
-			]];
-		} else {
-			$template = 'register-success.php';
+		} else { // try to register
+			switch (controll_api()->registerUser($email, $name, $password1)) {
+				case Controll::REGISTER_STATUS_OK:
+					$template = 'register-success.php';
+					break;
+				case Controll::REGISTER_STATUS_ERR_EXIST:
+					$template = [ 'register-user.php', [
+						'error' => "חשבון הדואל כבר רשום במערכת - נסה להכנס עם הספק המתאים או לבקש אתחול סיסמה"
+					]];
+					break;
+				default:
+					$template = [ 'register-user.php', [
+						'error' => "ארעה שגיאה לא צפויה ברישום, אנא פנה למנהל המערכת"
+					]];
+			}
 		}
 		break;
 	case 'do-login':
