@@ -219,6 +219,7 @@ class Controll {
 			log_debug("User registration of $name <$email> failed: " . print_r($res,true));
 			switch ($res->error) {
 				case 'This email address is already registered':
+				case 'Duplicate users':
 					return self::REGISTER_STATUS_ERR_EXIST;
 				default:
 					return self::REGISTER_STATUS_ERR_UNKNOWN;
