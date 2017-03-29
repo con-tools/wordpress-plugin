@@ -28,6 +28,10 @@ function log_error($message) {
 
 class Controll {
 	
+	const REGISTER_STATUS_OK = 0;
+	const REGISTER_STATUS_ERR_EXIST = 1;
+	const REGISTER_STATUS_ERR_UNKNOWN = 2;
+	
 	/**
 	 * Convention API key for the ConTroll API
 	 * @var string
@@ -211,9 +215,16 @@ class Controll {
 				'password-register' => $password,
 				'name' => $name,
 		]);
-		if (!is_object($res) or $res->status === false)
+		if (!is_object($res) or $res->status === false) {
 			log_debug("User registration of $name <$email> failed: " . print_r($res,true));
-		return is_object($res) and $res->status;
+			switch ($res->error) {
+				case 'This email address is already registered':
+					return self::REGISTER_STATUS_ERR_EXIST;
+				default:
+					return self::REGISTER_STATUS_ERR_UNKNOWN;
+			}
+		}
+		return self::REGISTER_STATUS_OK;
 	}
 	
 	public function getKey() {
