@@ -293,7 +293,7 @@ function disableCheckout() {
 		?>
 
 		<div class="shopping-cart">
-		<table id="my-tickets">
+		<table id="my-tickets" class="purchased-items">
 		<?php if ($$authorized_passes and !empty($authorized_passes)): ?>
 			<thead>
 				<tr>
@@ -358,7 +358,7 @@ function disableCheckout() {
 		<?php if (count($hostings)):?>
 		<?php $allowprint=true; ?>
 		<div class="shopping-cart">
-		<table>
+		<table class="purchased-items">
 		<thead>
 			<tr><th colspan="3"><h3>המשחקים שאני מנחה</h3></th></tr>
 			<tr>
