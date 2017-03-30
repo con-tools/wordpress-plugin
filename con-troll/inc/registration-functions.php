@@ -43,7 +43,7 @@ function controll_handle_forms() {
 	if (is_admin()) return; // we don't handle the admin dashboard
 	
 	global $controll_request_id;
-	log_info("Starting processing");
+	//log_info("Starting processing");
 	
 	if (array_key_exists('controll-auth-data', $_REQUEST)) {
 		// load redirect with auth data into the request
@@ -89,7 +89,7 @@ function controll_set_error($error_message) {
 
 function controll_show_errors($the_post) {
 	global $controll_error_message;
-	log_info("Starting rendering");
+	//log_info("Starting rendering");
 	if (!$controll_error_message)
 		return;
 	?>
@@ -97,7 +97,7 @@ function controll_show_errors($the_post) {
 	<?php
 }
 
-log_info("Code loaded");
+//log_info("Code loaded");
 
 // Register for POST form processing
 add_action( 'wp_loaded', 'controll_handle_forms' );
@@ -109,6 +109,6 @@ add_action( 'the_post', 'controll_verify_login_action' );
 add_action( 'the_post', 'controll_show_errors' );
 
 function controll_report_render_end() {
-	log_info("Done rendering");
+	//log_info("Done rendering");
 }
 add_action('get_footer', 'controll_report_render_end');

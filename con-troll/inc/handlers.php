@@ -166,21 +166,20 @@ function controll_handler_pass_package() {
 }
 
 function controll_verify_pass_package() {
-	global $log;
-	$log->Info("Starting verify pass package");
+	log_info("Starting verify pass package");
 	$passes = controll_api()->passes()->user_catalog();
 	$package_passes = [];
 	foreach ($passes as $pass)
 		$package_passes[$pass->pass->id][] = $pass;
-	$log->info("Got pass types: " . print_r(array_map(function($val){return count($val);},$package_passes), true));
+	log_info("Got pass types: " . print_r(array_map(function($val){return count($val);},$package_passes), true));
 	if (is_array($package_passes[62]) && count($package_passes[62]) < 3) {
-		$log->info("Need to remove passes from 62");
+		log_info("Need to remove passes from 62");
 		foreach ($package_passes[62] as $pass) {
 			controll_api()->passes()->delete($pass->id);
 		}
 	}
 	if (is_array($package_passes[72]) && count($package_passes[72]) < 3) {
-		$log->info("Need to remove passes from 72");
+		log_info("Need to remove passes from 72");
 		foreach ($package_passes[72] as $pass) {
 			controll_api()->passes()->delete($pass->id);
 		}
@@ -188,9 +187,8 @@ function controll_verify_pass_package() {
 }
 
 function controll_handler_activate_coupon() {
-	global $log;
 	$email = controll_api()->getUserEmail();
-	$log->Info("Starting coupon activation for $email");
+	log_info("Starting coupon activation for $email");
 	$code = @$_REQUEST['code'];
 	if (!$code) {
 		controll_send_error("יש להקיש קוד קופון להפעלתו");
@@ -204,6 +202,7 @@ function controll_handler_activate_coupon() {
 	}
 	
 	// handle errors
+	log_error("coupon activation error for $email: " . $res->error);
 	switch ($res->error) {
 		case 'Invalid code specified':
 			controll_send_error('קוד לא מוכר');
