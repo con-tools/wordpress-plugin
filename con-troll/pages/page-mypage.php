@@ -51,6 +51,7 @@ switch (@$_REQUEST['controll-action']) {
 }
 
 $errorMessage = @$_SESSION['error-message'];
+log_error("shopping cart error for $email: ".$errorMessage);
 unset($_SESSION['error-message']);
 switch ($errorMessage) {
 	case "No more tickets left":
