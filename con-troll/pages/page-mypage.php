@@ -271,7 +271,16 @@ function disableCheckout() {
 				</tr>
 			</tbody>
 			</table>
-			<p><strong>שימו לב</strong>: הכרטיסים בעגלת הקניות נשמרים לזמן מרבי של 3 שעות. לאחר מכן, אם לא התבצעה קניה, הכרטיסים יוחזרו למאגר באופן אוטומטי.</p>
+			</div>
+			
+			<div class="shopping-cart">
+				<form method="POST" action="?">
+				<input type="hidden" name="controll-action" value="activate-coupon">
+				<label>קוד קופון הנחה:
+				<input type="text" name="code" value="" class="short">
+				</label>
+				<button type="submit" class="small">הפעלה</button>
+				</form>
 			</div>
 		<?php endif ?>
 		
@@ -284,7 +293,7 @@ function disableCheckout() {
 		?>
 
 		<div class="shopping-cart">
-		<table>
+		<table id="my-tickets">
 		<?php if ($$authorized_passes and !empty($authorized_passes)): ?>
 			<thead>
 				<tr>

@@ -59,6 +59,12 @@ function controll_handle_forms() {
 	if (controll_api()->getUserEmail() and rand(0,3) == 0)
 		controll_api()->verify(); // ping the ConTroll server to keep our auth token alive
 	
+	// recover error messages from redirecting handler
+	if ($errorMessage = @$_SESSION['controll-error-message']) {
+		controll_set_error($errorMessage);
+		unset($_SESSION['controll-error-message']);
+	}
+	
 	// Choose handling by type of ConTroll form being submitted
 	switch (@$_REQUEST['controll-action']) {
 		case 'buy-pass': return controll_handler_buy_pass();
@@ -67,7 +73,13 @@ function controll_handle_forms() {
 		case 'cancel-ticket': return controll_handler_cancel_ticket();
 		case 'login': return controll_authorize();
 		case 'register-ticket': return controll_handler_registration();
+		case 'activate-coupon': return controll_handler_activate_coupon();
 	}
+}
+
+function controll_send_error($error_message) {
+	$_SESSION['controll-error-message'] = $error_message;
+	controll_redirect_helper($_SERVER['REQUEST_URI']);
 }
 
 function controll_set_error($error_message) {

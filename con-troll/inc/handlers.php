@@ -186,3 +186,32 @@ function controll_verify_pass_package() {
 		}
 	}
 }
+
+function controll_handler_activate_coupon() {
+	global $log;
+	$email = controll_api()->getUserEmail();
+	$log->Info("Starting coupon activation for $email");
+	$code = @$_REQUEST['code'];
+	if (!$code) {
+		controll_send_error("יש להקיש קוד קופון להפעלתו");
+		return;
+	}
+	
+	$res = controll_api()->coupons()->activate($code);
+	if ($res->status) {
+		controll_send_error("הופעל קופון בשווי ₪" . (int)$res->value);
+		return;
+	}
+	
+	// handle errors
+	switch ($res->error) {
+		case 'Invalid code specified':
+			controll_send_error('קוד לא מוכר');
+			return;
+		case 'Code already activated':
+			controll_send_error('הקוד כבר הופעל למשתמש זה');
+			return;
+		default:
+			controll_send_error('שגיאה לא צפויה: ' . $res->error);
+	}
+}
