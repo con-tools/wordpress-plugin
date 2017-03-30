@@ -569,6 +569,12 @@ class ConTrollCoupons {
 	public function catalog() {
 		return $this->api->apiCall('entities/coupons?self=1', $this->api->getSessionToken());
 	}
+	
+	public function activate($code) {
+		return $this->api->apiCall('entities/coupons', $this->api->getSessionToken(), [
+				'code' => $code
+		]);
+	}
 }
 
 class ConTrollMerchandise {
