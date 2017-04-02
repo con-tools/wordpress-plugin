@@ -268,8 +268,8 @@ function disableCheckout() {
 						<form method="POST" action="http://api.con-troll.org/checkout">
 						<input type="hidden" name="token" value="<?php echo controll_api()->getSessionToken()?>">
 						<input type="hidden" name="convention" value="<?php echo controll_api()->getKey()?>">
-						<input type="hidden" name="ok" value="<?php echo get_permalink();?>?action=transaction-done">
-						<input type="hidden" name="fail" value="<?php echo get_permalink();?>?action=transaction-failed">
+						<input type="hidden" name="ok" value="<?php echo get_permalink();?>?controll-action=transaction-done">
+						<input type="hidden" name="fail" value="<?php echo get_permalink();?>?controll-action=transaction-failed">
 						<button type="submit" id="shoppingcart-checkout-button">לתשלום</button>
 						</form>
 					</td>
