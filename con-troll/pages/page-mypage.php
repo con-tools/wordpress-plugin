@@ -16,6 +16,10 @@ if (!$email) {
 	exit;
 }
 
+// backward compatibility
+if (@$_REQUEST['action'] and !@$_REQUEST['controll-action'])
+	$_REQUEST['controll-action'] = $_REQUEST['action'];
+
 switch (@$_REQUEST['controll-action']) {
 	case 'update-ticket-amount':
 		$amount = (int)$_REQUEST['amount'];
